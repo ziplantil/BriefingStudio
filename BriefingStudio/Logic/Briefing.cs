@@ -409,6 +409,7 @@ namespace BriefingStudio
             this.sequence = sequence;
             backgroundName = screens[screenNum].bsName;
 
+            briefingColor = 0;
             tabStop = 0;
 
             rendering = true;
