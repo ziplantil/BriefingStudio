@@ -173,6 +173,7 @@ namespace BriefingStudio
 
         private void DescentHogOpenFileDialog_FileOk(object sender, CancelEventArgs e)
         {
+            editor.SetDescentGame(0);
             baseHog?.Dispose();
             baseHogLabel.Text = "No Descent HOG file specified";
             baseHog = null;
@@ -242,6 +243,7 @@ namespace BriefingStudio
             InitScreens(gamefontL, gamefontH);
             lowres.Refresh();
             highres.Refresh();
+            editor.SetDescentGame(descentGame);
         }
 
         private void WorkingHogOpenFileDialog_FileOk(object sender, CancelEventArgs e)

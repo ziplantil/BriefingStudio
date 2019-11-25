@@ -52,6 +52,11 @@
     <Compile Include="Logic\Formats\HOGFile.cs" />
     <Compile Include="Logic\Formats\HOGResource.cs" />
     <Compile Include="Logic\Formats\Utils.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Windows\HighResScreenForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -87,6 +92,12 @@
     <Compile Include="Windows\TXBEditorForm.Designer.cs">
       <DependentUpon>TXBEditorForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Windows\TXBSyntaxHelpForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\TXBSyntaxHelpForm.Designer.cs">
+      <DependentUpon>TXBSyntaxHelpForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Windows\HighResScreenForm.resx">
       <DependentUpon>HighResScreenForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -98,19 +109,17 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <EmbeddedResource Include="Windows\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Windows\TXBEditorForm.resx">
       <DependentUpon>TXBEditorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Windows\TXBSyntaxHelpForm.resx">
+      <DependentUpon>TXBSyntaxHelpForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -124,6 +133,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\briefingHelpD1.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\briefingHelpD2.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

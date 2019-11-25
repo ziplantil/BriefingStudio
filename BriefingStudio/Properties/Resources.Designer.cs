@@ -59,5 +59,25 @@ namespace BriefingStudio.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to D1
+        ///.
+        /// </summary>
+        internal static string briefingHelpD1 {
+            get {
+                return ResourceManager.GetString("briefingHelpD1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to D2
+        ///.
+        /// </summary>
+        internal static string briefingHelpD2 {
+            get {
+                return ResourceManager.GetString("briefingHelpD2", resourceCulture);
+            }
+        }
     }
 }

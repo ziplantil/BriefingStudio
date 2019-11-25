@@ -38,6 +38,7 @@
             this.sequenceNumericUpDown = new System.Windows.Forms.NumericUpDown();
             this.jumpButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
+            this.syntaxHelpButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.sequenceNumericUpDown)).BeginInit();
             this.SuspendLayout();
             // 
@@ -147,11 +148,22 @@
             this.label2.TabIndex = 9;
             this.label2.Text = "Seq";
             // 
+            // syntaxHelpButton
+            // 
+            this.syntaxHelpButton.Location = new System.Drawing.Point(354, 435);
+            this.syntaxHelpButton.Name = "syntaxHelpButton";
+            this.syntaxHelpButton.Size = new System.Drawing.Size(225, 23);
+            this.syntaxHelpButton.TabIndex = 11;
+            this.syntaxHelpButton.Text = "Syntax help";
+            this.syntaxHelpButton.UseVisualStyleBackColor = true;
+            this.syntaxHelpButton.Click += new System.EventHandler(this.syntaxHelpButton_Click);
+            // 
             // TXBEditorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(584, 461);
+            this.Controls.Add(this.syntaxHelpButton);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.jumpButton);
             this.Controls.Add(this.sequenceNumericUpDown);
@@ -186,5 +198,6 @@
         private System.Windows.Forms.NumericUpDown sequenceNumericUpDown;
         private System.Windows.Forms.Button jumpButton;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button syntaxHelpButton;
     }
 }

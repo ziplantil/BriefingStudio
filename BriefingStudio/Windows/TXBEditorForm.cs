@@ -9,6 +9,7 @@ namespace BriefingStudio
         public delegate void PlayBriefing(string text, int n);
         public delegate void StopBriefing();
         public delegate void SaveBriefing(string filename, string contents);
+        private TXBSyntaxHelpForm txbSyntaxHelpForm = new TXBSyntaxHelpForm();
 
         private FindFile findFile;
         private PlayBriefing playBriefing;
@@ -100,6 +101,16 @@ namespace BriefingStudio
         private void txbBox_TextChanged(object sender, EventArgs e)
         {
             this.Text = "TXB Editor (UNSAVED)";
+        }
+
+        private void syntaxHelpButton_Click(object sender, EventArgs e)
+        {
+            txbSyntaxHelpForm.Show();
+        }
+
+        public void SetDescentGame(int descentGame)
+        {
+            txbSyntaxHelpForm.SetDescentGame(descentGame);
         }
     }
 }

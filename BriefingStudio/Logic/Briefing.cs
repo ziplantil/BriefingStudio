@@ -455,7 +455,7 @@ namespace BriefingStudio
                 graphics.DrawImage(backgroundCache, 0, 0);
             }
             return true;
-        }   
+        }
 
         private int NextChar()
         {

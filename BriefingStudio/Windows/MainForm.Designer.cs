@@ -109,7 +109,7 @@
             // baseHogLabel
             // 
             this.baseHogLabel.AutoSize = true;
-            this.baseHogLabel.Location = new System.Drawing.Point(-3, 218);
+            this.baseHogLabel.Location = new System.Drawing.Point(-3, 221);
             this.baseHogLabel.Name = "baseHogLabel";
             this.baseHogLabel.Size = new System.Drawing.Size(152, 13);
             this.baseHogLabel.TabIndex = 5;
