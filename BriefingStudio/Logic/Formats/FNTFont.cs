@@ -1,0 +1,238 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+
+namespace BriefingStudio
+{
+    public class FNTFont
+    {
+        protected short cwidth;
+        protected short cheight;
+        protected short flags;
+        protected char minchar;
+        protected char maxchar;
+        protected byte[][] fontData;
+        protected short[] widths;
+        protected Dictionary<int, int> kerns;
+        protected bool isProportional;
+        protected bool hasKerning;
+        protected char lastChar;
+
+        public FNTFont(FNTFont font)
+        {
+            this.cwidth = font.cwidth;
+            this.cheight = font.cheight;
+            this.flags = font.flags;
+            this.minchar = font.minchar;
+            this.maxchar = font.maxchar;
+            this.fontData = font.fontData;
+            this.widths = font.widths;
+            this.kerns = font.kerns;
+            this.isProportional = font.isProportional;
+            this.hasKerning = font.hasKerning;
+        }
+
+        public FNTFont(Stream stream)
+        {
+            kerns = new Dictionary<int, int>();
+            using (BinaryReader br = new BinaryReader(stream))
+            {
+                byte[] first8 = br.ReadBytes(8);
+                // PSFN : 50 53 46 4e
+                if (first8.Length < 8 || first8[0] != 0x50 || first8[1] != 0x53 || first8[2] != 0x46 || first8[3] != 0x4e)
+                    throw new ArgumentException("file is not a valid Parallax FNT font");
+                cwidth = br.ReadInt16();
+                cheight = br.ReadInt16();
+                flags = br.ReadInt16();
+                if ((flags & 1) != 0)
+                    throw new ArgumentException("color fonts are not supported");
+
+                isProportional = (flags & 2) != 0;
+                hasKerning = (flags & 4) != 0;
+
+                br.ReadInt16(); // baseline, not used right now
+                minchar = Convert.ToChar(br.ReadByte());
+                maxchar = Convert.ToChar(br.ReadByte());
+                br.ReadInt16(); // byte width, not used right now
+                int dataPointer = br.ReadInt32() + 8;
+                br.ReadInt32(); // chars - always 0
+                int widthPointer = br.ReadInt32() + 8;
+                int kernPointer = br.ReadInt32() + 8;
+
+                int charCount = maxchar - minchar + 1;
+
+                // widths
+                widths = new short[charCount];
+                if (isProportional)
+                {
+                    stream.Seek(widthPointer, SeekOrigin.Begin);
+                    for (int i = 0; i < charCount; ++i)
+                    {
+                        widths[i] = br.ReadInt16();
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < charCount; ++i)
+                    {
+                        widths[i] = cwidth;
+                    }
+                }
+
+                if (hasKerning)
+                {
+                    // kerns
+                    stream.Seek(kernPointer, SeekOrigin.Begin);
+                    while (true)
+                    {
+                        char first = Convert.ToChar(br.ReadByte());
+                        if (first >= 0xFF)
+                        {
+                            break;
+                        }
+                        char second = Convert.ToChar(br.ReadByte());
+                        kerns[(first << 8) + second] = br.ReadByte();
+                    }
+                }
+
+                fontData = new byte[charCount][];
+
+                stream.Seek(dataPointer, SeekOrigin.Begin);
+                for (int i = 0; i < charCount; ++i)
+                {
+                    int byteWidth = (widths[i] + 7) / 8;
+                    fontData[i] = br.ReadBytes(byteWidth * cheight);
+                }
+            }
+            ResetKerning();
+        }
+
+        public void ResetKerning()
+        {
+            lastChar = '\0';
+        }
+
+        public bool IsCharInFont(char c)
+        {
+            return minchar <= c && c <= maxchar;
+        }
+
+        public int GetCharWidth(char c)
+        {
+            if (IsCharInFont(c))
+            {
+                return widths[c - minchar];
+            }
+            else
+            {
+                return isProportional ? cwidth / 2 : cwidth;
+            }
+        }
+
+        public int GetKernOffset(char c)
+        {
+            int kernIndex = (lastChar << 8) + c;
+            if (hasKerning && kerns.ContainsKey(kernIndex))
+            {
+                return kerns[kernIndex] - GetCharWidth(lastChar);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public virtual void DrawCharacterRaw(Bitmap b, char c, Color clr, ref int x, int y)
+        {
+            int thisWidth = GetCharWidth(c);
+
+            if (IsCharInFont(c))
+            {
+                byte[] charData = fontData[c - minchar];
+
+                Size imageSize = b.Size;
+
+                int removeLeftX = 0;
+                int removeRightX = 0;
+                int removeTopY = 0;
+                int removeBottomY = 0;
+                if (x < 0)
+                {
+                    removeLeftX = -x;
+                    x = 0;
+                }
+                if (y < 0)
+                {
+                    removeTopY = -y;
+                    y = 0;
+                }
+                if (x + thisWidth > imageSize.Width)
+                {
+                    removeRightX = (x + thisWidth) - imageSize.Width;
+                    x -= removeRightX;
+                }
+                if (y + cheight > imageSize.Height)
+                {
+                    removeBottomY = (y + cheight) - imageSize.Height;
+                    y -= removeBottomY;
+                }
+
+                BitmapData data = b.LockBits(new Rectangle(x, y, thisWidth, cheight), System.Drawing.Imaging.ImageLockMode.ReadWrite, b.PixelFormat);
+
+                byte cr = clr.R;
+                byte cg = clr.G;
+                byte cb = clr.B;
+
+                int cptr = 0;
+                IntPtr ptr = data.Scan0;
+                int bytes = Math.Abs(data.Stride) * (cheight - removeTopY - removeBottomY);
+                byte[] rgbValues = new byte[bytes];
+                System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
+
+                for (int yo = removeTopY; yo < cheight - removeBottomY; ++yo)
+                {
+                    int p = yo * data.Stride;
+                    for (int xo = removeLeftX; xo < thisWidth - removeRightX; xo += 8)
+                    {
+                        byte sliver = charData[cptr++];
+                        for (int xs = 0; xs < 8; ++xs)
+                        {
+                            if (xo + xs >= thisWidth)
+                                break;
+                            if ((sliver & 0x80) != 0)
+                            {
+                                rgbValues[p + (xo + xs) * 3] = cb;
+                                rgbValues[p + (xo + xs) * 3 + 1] = cg;
+                                rgbValues[p + (xo + xs) * 3 + 2] = cr;
+                            }
+                            sliver <<= 1;
+                        }
+                    }
+                }
+
+                System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
+                b.UnlockBits(data);
+            }
+
+            x += thisWidth;
+            x += GetKernOffset(c);
+            lastChar = c;
+        }
+
+        public void DrawCharacter(Bitmap b, char c, Color fg, Color bg, ref int x, int y, bool shadow)
+        {
+            if (shadow)
+            {
+                int dummy = x + 1;
+                DrawCharacterRaw(b, c, bg, ref x, y);
+                DrawCharacterRaw(b, c, fg, ref dummy, y);
+            }
+            else
+            {
+                DrawCharacterRaw(b, c, fg, ref x, y);
+            }
+        }
+    }
+}
