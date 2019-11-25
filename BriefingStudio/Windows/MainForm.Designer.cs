@@ -157,6 +157,11 @@
             // levelNumericUpDown
             // 
             this.levelNumericUpDown.Location = new System.Drawing.Point(66, 168);
+            this.levelNumericUpDown.Maximum = new decimal(new int[] {
+            127,
+            0,
+            0,
+            0});
             this.levelNumericUpDown.Name = "levelNumericUpDown";
             this.levelNumericUpDown.Size = new System.Drawing.Size(76, 20);
             this.levelNumericUpDown.TabIndex = 15;

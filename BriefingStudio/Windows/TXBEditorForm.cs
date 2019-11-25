@@ -106,6 +106,7 @@ namespace BriefingStudio
         private void syntaxHelpButton_Click(object sender, EventArgs e)
         {
             txbSyntaxHelpForm.Show();
+            txbSyntaxHelpForm.BringToFront();
         }
 
         public void SetDescentGame(int descentGame)

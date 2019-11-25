@@ -1,1 +1,212 @@
-D1
+TXB BRIEFING HELP FOR DESCENT I
+===============================
+
+Sequence
+--------
+
+Sequence numbers are screen numbers, and are hardcoded.
+For a complete table of screen numbers, consul
+Appendix A.
+
+Notes
+-----
+Note that text colors are hardcoded, but will be matched
+against the palette of the current PCX background,
+allowing some variation. In order to preserve the
+correct colors, they should be present in the PCX palette.
+
+Any lines starting with ; are ignored.
+
+Commands
+--------
+
+Special commands start with a $ (dollar sign), and
+should ideally on their own line (required if the line
+contains another command).
+
+$Sn
+	Selects a new screen. The number should be that of
+	a valid screen. For a list of valid screens and
+	their numbers, consult Appendix A.
+
+	Example:
+		$S1
+		; change to screen 1
+
+$Cn
+	Changes the text color. Available options are
+		0: green
+		1: beige
+	If DXX extensions are enabled:
+		2: red
+		3: blue
+		4: gray
+		5: yellow
+		6: purple
+	Using DXX extensions in the original DOS game will
+	result in undefined behavior.
+
+	Example:
+		$C0
+		; All text from now on will be green.
+
+$F
+	Toggles the cursor, which is off by default.
+	If the cursor is on, it is shown when every
+	new character is drawn and will blink while
+	waiting for a keypress.
+
+$Tn
+	Sets the tab stop value, in pixels.
+	If a tab character is present in the briefing text,
+	the cursor will be moved right until the tab stop
+	point. THe default value is 0, effectively
+	disabling tabs.
+
+	Example:
+	    $T70
+		; Tab stop at 70 pixels. If the cursor is
+		; now less than 70 pixels from the left edge
+		; of the text area, a tab character will
+		; move it there.
+
+$P
+	Ends a page. The next page will be displayed only
+	when the player presses a key. If the cursor is
+	enabled, the cursor will be shown flashing until
+	the page is changed. Page changes will
+	automatically disable all special animations.
+
+$Rx
+	Starts a robot animation. The animation
+	consists of the robot model that slowly spins
+	around, shown on the right side of the screen.
+	The number selects the robot to be shown.
+	For a list of numbers, consult Appendix B.
+	The robot animation will be shown until a
+	page change.
+
+$Ntexture
+	Displays a wall texture from the .PIG on the
+	right side of the screen. The texture will be
+	shown until a page change. The size of the
+	bitmap will be assumed to be 64x64.
+
+	Textures will be animated, but must have 14
+	frames if so. Animations will thus play
+	14 frames forward and then back. This is
+	designed for the exit door (door13), which
+	will be correctly shown opening and closing.
+
+$Otexture
+	Displays a wall texture from the .PIG on the
+	right side of the screen. The texture will be
+	shown until a page change. The size of the
+	bitmap will be assumed to be 94x94.
+	
+	Textures will be animated, but must have 10
+	frames if so. The animation will loop
+	forever, playing the 10 frames forward
+	indefinitely.
+
+$Btexture
+	Displays a BBM texture from the .HOG on
+	the right side of the screen. The texture 
+	will be shown until a page change. The
+	filename should not include the .bbm
+	extension, as it is added automatically.
+
+	The BBM texture should be present in
+	a .HOG file, and the optimal resolution
+	is 64x64.
+
+Appendices
+----------
+
+Appendix A: List of screens for $Sx
+	$S		Scene, level displayed in
+	   1	First intro screen, view of PTMC Station Shiva
+	        Displayed in intro
+	   2	Conference room with Dravis
+	        Displayed in intro
+	   3	Robot and exit door information
+	        Displayed in intro
+	   4	Conference room with Dravis
+	        Displayed in intro
+	--- Moon
+	   5    Briefing for level 1, displayed before level 1
+	   6    Briefing for level 2, displayed before level 2
+	   7    Briefing for level 3, displayed before level 3
+	--- Venus
+	   8    Briefing for level 4, displayed before level 4
+	   9    Briefing for level 5, displayed before level 5
+	--- Mercury
+	  10    Robot info, displayed before level 6
+	  11    Briefing for level 6, displayed before level 6
+	  12    Briefing for level 7, displayed before level 7
+	--- Mars
+	  13    Robot info, displayed before level 8
+	  14    Briefing for level 8, displayed before level 8
+	  15    Briefing for level 9, displayed before level 9
+	  16    Robot info, displayed before level 10
+	  17    Briefing for level 10, displayed before level 10
+	--- Jupiter
+	  18    Briefing for level 11, displayed before level 11
+	  19    Briefing for level 12, displayed before level 12
+	  20    Robot info, displayed before level 13
+	  21    Briefing for level 13, displayed before level 13
+	  22    Briefing for level 14, displayed before level 14
+	--- Saturn
+	  23    Briefing for level 15, displayed before level 15
+	  24    Robot info, displayed before level 16
+	  25    Briefing for level 16, displayed before level 16
+	  26    Robot info, displayed before level 17
+	  27    Briefing for level 17, displayed before level 17
+	--- Uranus
+	  28    Briefing for level 18, displayed before level 18
+	  29    Briefing for level 19, displayed before level 19
+	  30    Briefing for level 20, displayed before level 20
+	  31    Briefing for level 21, displayed before level 21
+	--- Neptune
+	  32    Briefing for level 22, displayed before level 22
+	  33    Briefing for level 23, displayed before level 23
+	  34    Briefing for level 24, displayed before level 
+	--- Pluto
+	  35    Briefing for level 25, displayed before level 25
+	  36    Briefing for level 26, displayed before level 26
+	  37    Briefing for level 27, displayed before level 27
+	--- Asteroids
+	  38    Briefing for extra level 1, displayed before extra level 1
+	  39    Briefing for extra level 2, displayed before extra level 2
+	  40    Briefing for extra level 3, displayed before extra level 3
+	--- Ending
+	  41	First ending screen; "level 127"
+	  42	Second ending screen; "level 126"
+	  43	Third ending screen; "level 126"
+	  44	Fourth ending screen; "level 126"
+
+Appendix B: Robot IDs
+	 0		Medium Hulk
+	 1		Medium Lifter
+	 2		Spider Processor
+	 3		Class 1 Drone
+	 4		Class 2 Drone
+	 5		Cloaked Class 1 Driller
+	 6		Cloaked Medium Hulk
+	 7		Class 2 Supervisor
+	 8		Secondary Lifter
+	 9		Class 1 Heavy Driller
+	10		Class 3 Gopher
+	11		Class 1 Platform
+	12		Class 2 Platform
+	13		Split Pod
+	14		Baby Spider
+	15		Fusion Hulk / Miniboss
+	16		Super Hulk
+	17		Descent I Level 7 Boss
+	18		Cloaked Lifter
+	19		Class 1 Driller
+	20		Light Hulk
+	21		Advanced Lifter
+	22		PTMC Defense Prototype
+	23		Descent I Final Boss

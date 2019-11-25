@@ -345,6 +345,7 @@ namespace BriefingStudio
         private void txbEditorButton_Click(object sender, EventArgs e)
         {
             editor.Show();
+            editor.BringToFront();
             editor.SetDelegates(FindFile, PlayBriefing, StopBriefing, SaveBriefing);
             if (workingHog != null && briefingNameTextBox.Text.Length > 0)
             {
@@ -355,6 +356,7 @@ namespace BriefingStudio
         private void button3_Click(object sender, EventArgs e)
         {
             settingsForm.Show();
+            settingsForm.BringToFront();
         }
     }
 }

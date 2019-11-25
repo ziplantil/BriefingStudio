@@ -70,6 +70,7 @@
             this.txbBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txbBox.Size = new System.Drawing.Size(573, 397);
             this.txbBox.TabIndex = 2;
+            this.txbBox.WordWrap = false;
             this.txbBox.TextChanged += new System.EventHandler(this.txbBox_TextChanged);
             // 
             // reloadButton
@@ -119,6 +120,11 @@
             // 
             this.sequenceNumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.sequenceNumericUpDown.Location = new System.Drawing.Point(383, 6);
+            this.sequenceNumericUpDown.Maximum = new decimal(new int[] {
+            127,
+            0,
+            0,
+            0});
             this.sequenceNumericUpDown.Name = "sequenceNumericUpDown";
             this.sequenceNumericUpDown.Size = new System.Drawing.Size(62, 20);
             this.sequenceNumericUpDown.TabIndex = 7;
@@ -150,6 +156,7 @@
             // 
             // syntaxHelpButton
             // 
+            this.syntaxHelpButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.syntaxHelpButton.Location = new System.Drawing.Point(354, 435);
             this.syntaxHelpButton.Name = "syntaxHelpButton";
             this.syntaxHelpButton.Size = new System.Drawing.Size(225, 23);

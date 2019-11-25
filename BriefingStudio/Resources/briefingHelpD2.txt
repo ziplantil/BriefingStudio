@@ -1,1 +1,292 @@
-D2
+TXB BRIEFING HELP FOR DESCENT II
+================================
+
+Sequence
+--------
+
+Sequence numbers correspond to level numbers.
+The corresponding sequence N is played as a briefing
+before level N starts. Sequence 0 is not used.
+
+To play a briefing after all of the levels are complete,
+use the sequence number N+1, where N is the number
+of levels.
+
+Briefings cannot be added to secret levels.
+
+Notes
+-----
+Note that text colors are hardcoded, but will be matched
+against the palette of the current PCX background,
+allowing some variation. In order to preserve the
+correct colors, they should be present in the PCX palette.
+
+Any lines starting with ; are ignored.
+
+Commands
+--------
+
+Special commands start with a $ (dollar sign), and
+should ideally on their own line (required if the line
+contains another command).
+
+$Sn
+	Delimits sequences. For more information on the
+	sequence numbering, see the Sequences section above.
+	Ideally, sequence numbers should start from 1 and
+	be increasing over the briefing file.
+
+	Example:
+		$S1
+		; beginning of section 1
+		; will be shown before level 1
+
+$Dn bg.pcx level message ulx uly width height
+$Zbg.pcx
+	These two commands should always be used together,
+	in succession, and should be used at least once
+	immediately after an $S command (but may be used
+	thenceforth an unlimited number of times).
+	
+	The first defines a new screen, using the define
+	values. The background should point to a .pcx file.
+	The second will actually load and change the
+	background.
+
+	The number after $D is the screen number, which
+	should be between 0-59 (inclusive). Existing screens
+	can be overwritten.
+
+	level and message are two values that represent the
+	level and message number, respectively. These values
+	are seemingly unused in Descent II.
+	
+	The ulx, uly are the top-left coordinates of the 
+	text area, measured in pixels from the top-left of 
+	the screen. width and height control the size of this
+	text area, within which text is made to fit.
+
+	$Z only takes the filename of the background, which
+	should match with the filename given to $D.
+
+	If viewing in high resolution, a B will be added
+	before .pcx in the filename to load a high-quality
+	version of the background. Both must be present in
+	order for the backgrounds to properly work. ulx,
+	uly, width and height are in scale for a 320x200
+	low-resolution mode, and will be automatically
+	upscaled for high-resolution modes.
+
+	Example:
+		$D1 end01.pcx 0 3 20 22 257 177
+		$Zend01.pcx
+
+		; Background end01.pcx or end01b.pcx
+		; for high-resolution, level number 0,
+		; messsge number 3, screen number 1, text region
+		; is at (20, 22) and its size is 257x177.
+
+$Un
+$Zbg.pcx
+	Loads an earlier screen defined with $Dn. $Z must
+	still be used to change the background.
+
+$Cn
+	Changes the text color. Available options are
+		0: green
+		1: beige
+		2: blue
+	If DXX extensions are enabled:
+		3: blue
+		4: gray
+		5: yellow
+		6: purple
+	Using DXX extensions in the original DOS game will
+	result in undefined behavior.
+
+	Example:
+		$C0
+		; All text from now on will be green.
+
+$F
+	Toggles the cursor, which is off by default.
+	If the cursor is on, it is shown when every
+	new character is drawn and will blink while
+	waiting for a keypress.
+
+$Tn
+	Sets the tab stop value, in pixels.
+	If a tab character is present in the briefing text,
+	the cursor will be moved right until the tab stop
+	point. THe default value is 0, effectively
+	disabling tabs.
+
+	Example:
+	    $T70
+		; Tab stop at 70 pixels. If the cursor is
+		; now less than 70 pixels from the left edge
+		; of the text area, a tab character will
+		; move it there.
+
+$P
+	Ends a page. The next page will be displayed only
+	when the player presses a key. If the cursor is
+	enabled, the cursor will be shown flashing until
+	the page is changed. Page changes will
+	automatically disable all special animations.
+
+$Rx
+	Starts a robot animation. The animations are
+	stored as movies with names RBx.MVE, where x
+	corresponds to the character given. A list
+	of movies in D2 is provided under Appendix A.
+	The robot animation will play until a page
+	change.
+
+$Ntexture
+	Displays a wall texture from the .PIG on the
+	right side of the screen. The texture will be
+	shown until a page change. The size of the
+	bitmap will be assumed to be 64x64.
+
+	Textures will be animated, but must have 14
+	frames if so. Animations will thus play
+	14 frames forward and then back. This is
+	designed for the exit door (door13), which
+	will be correctly shown opening and closing.
+
+$Otexture
+	Displays a wall texture from the .PIG on the
+	right side of the screen. The texture will be
+	shown until a page change. The size of the
+	bitmap will be assumed to be 94x94.
+	
+	Textures will be animated, but must have 10
+	frames if so. The animation will loop
+	forever, playing the 10 frames forward
+	indefinitely.
+
+$Btexture
+	Displays a BBM texture from the .HOG on
+	the right side of the screen. The texture 
+	will be shown until a page change. The
+	filename should not include the .bbm
+	extension, as it is added automatically.
+
+	The BBM texture should be present in
+	a .HOG file, and the optimal resolution
+	is 64x64.
+
+DXX-Rebirth adds an additional command:
+
+$:$F:Rebirth.rotate.robot n
+$F
+	These two commands should be used in
+	succession.
+
+	Displays a 3D spinning robot animation like
+	that produced by the $R command in Descent I.
+	The number corresponds to the robot ID. To
+	see a list, consult Appendix B below.
+
+	On unsupported clients, nothing will be
+	displayed.
+
+Appendices
+----------
+
+Appendix A: List of robot movies for $Rx
+	$R		Displayed robot
+	  A		BPER Bot
+	  B		Smelter
+	  C		Defense Prototype (Mine Guard)
+	  D		ICE SPIndle DEfense Robot
+	  E		Bulk Destroyer
+	  F		TRN Racer
+	  G		Fox Attack Bot, External Operations
+	  H		Sidearm
+	  I		LOU Guard
+	  J		Guide-Bot
+	  K		Internal Tactical Security Control Robot (ITSC)
+	  L		Omega Defense Spawn
+	  M		Internal Tactical Droid (IT Droid)
+	  N		Portable Equalizing Standard Transbot (PEST)
+	  O		Sidearm Modula
+	  P		Preliminary Integration Groundbot (PIG)
+	  Q		Spawn (Spider Spawn)
+	  R		Diamond Claw, Second Generation
+	  S		Seeker
+	  T		Bandit
+	  U		E-Bandit
+	  W		Boarshead
+	  X		Spider
+	  Y		Red Hornet
+
+Appendix B: Robot IDs
+	 0		Medium Hulk
+	 1		Medium Lifter
+	 2		Spider Processor
+	 3		Class 1 Drone
+	 4		Class 2 Drone
+	 5		Cloaked Class 1 Driller
+	 6		Cloaked Medium Hulk
+	 7		Class 2 Supervisor
+	 8		Secondary Lifter
+	 9		Class 1 Heavy Driller
+	10		Class 3 Gopher
+	11		Class 1 Platform
+	12		Class 2 Platform
+	13		Split Pod
+	14		Baby Spider
+	15		Fusion Hulk / Miniboss
+	16		Super Hulk
+	17		Descent I Level 7 Boss
+	18		Cloaked Lifter
+	19		Class 1 Driller
+	20		Light Hulk
+	21		Advanced Lifter
+	22		PTMC Defense Prototype
+	23		Descent I Final Boss
+	24		BPER Bot
+	25		Smelter
+	26		ICE SPIndle DEfense Robot
+	27		Bulk Destroyer
+	28		TRN Racer
+	29		Fox Attack Bot, External Operations
+	30		Sidearm
+	31		Descent II Level 4 Boss
+	32		Descent I Level 7 Boss
+	33		Guide-Bot
+	34		Defense Prototype (Mine Guard)
+	35		Evil Twin
+	36		Internal Tactical Security Control Robot (ITSC)
+	37		Internal Tactical Droid (IT Droid)
+	38		Portable Equalizing Standard Transbot (PEST)
+	39		Preliminary Integration Groundbot (PIG)
+	40		Diamond Claw, Second Generation
+	41		Red Hornet
+	42		Bandit
+	43		Seeker
+	44		E-Bandit
+	45		Descent II Level 12 Boss
+	46		Descent II Level 8 Boss
+	47		Boarshead
+	48		Spider
+	49		Omega Defense Spawn
+	50		Sidearm Modula
+	51		LOU Guard
+	52		Descent II Level 20 Boss
+	53		Level 4 Clone Miniboss
+	54		Cloaked Diamond Claw
+	55		Cloaked Smelter
+	56		Guppy
+	57		Smelter
+	58		Omega Defense Spawn
+	59		BPER Bot
+	60		Spider
+	61		Spawn (Spider Spawn)
+	62		Descent II Level 16 Boss
+	63		Spawn (Spider Spawn)
+	64		Descent II Final Boss
+	65		Auxiliary Reactor
+

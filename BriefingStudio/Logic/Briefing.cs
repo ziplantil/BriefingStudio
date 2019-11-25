@@ -17,6 +17,7 @@ namespace BriefingStudio
         private readonly Bitmap flipped;
         private Graphics graphics;
         private Graphics flipper;
+        private Rectangle frame;
         private readonly Object graphicsLock = new Object();
         private int charDelay;
         private bool useDelay;
@@ -72,6 +73,7 @@ namespace BriefingStudio
             flipped = new Bitmap(screen);
             graphics = Graphics.FromImage(screen);
             flipper = Graphics.FromImage(flipped);
+            frame = new Rectangle(new Point(0, 0), screen.Size);
             briefingColor = 0;
             this.font = font;
             playing = false;
@@ -381,11 +383,17 @@ namespace BriefingStudio
                     {
                         firstSequence = i;
                     }
-                    else if (firstSequence >= 0 && screens[i].level > sequence)
+                    else if (firstSequence >= 0 && screens[i].level != sequence)
                     {
                         firstNonSequence = i;
                         break;
                     }
+                }
+
+                if (firstSequence > 40)
+                {
+                    firstSequence -= 40;
+                    if (firstNonSequence > 40) firstNonSequence -= 40;
                 }
 
                 if (firstSequence >= 0)
@@ -397,6 +405,10 @@ namespace BriefingStudio
                     text = "";
                 }
                 screenNum = firstSequence;
+                if (screenNum < 0 || screenNum >= screens.Count)
+                {
+                    return;
+                }
             }
             else
             {
@@ -452,7 +464,14 @@ namespace BriefingStudio
             lock (graphicsLock)
             {
                 graphics.Clear(clearColor);
-                graphics.DrawImage(backgroundCache, 0, 0);
+                if (descentGame == 1 && highRes)
+                {
+                    graphics.DrawImage(backgroundCache, frame, 0, 0, 320, 200, GraphicsUnit.Pixel);
+                }
+                else
+                {
+                    graphics.DrawImage(backgroundCache, 0, 0);
+                }
             }
             return true;
         }
@@ -1012,6 +1031,7 @@ namespace BriefingStudio
                 screens.Add(makeScaledBriefingScreen("aster01.pcx", 256 - 1, 38, 10, 90, 300, 200));
                 screens.Add(makeScaledBriefingScreen("aster01.pcx", 256 - 2, 39, 10, 90, 300, 200));
                 screens.Add(makeScaledBriefingScreen("aster01.pcx", 256 - 3, 40, 10, 90, 300, 200));
+                screens.Add(makeScaledBriefingScreen("end01.pcx", 0x7f, 1, 23, 40, 320, 200));
                 screens.Add(makeScaledBriefingScreen("end02.pcx", 0x7e, 1, 5, 5, 300, 200));
                 screens.Add(makeScaledBriefingScreen("end01.pcx", 0x7e, 2, 23, 40, 320, 200));
                 screens.Add(makeScaledBriefingScreen("end03.pcx", 0x7e, 3, 5, 5, 300, 200));
