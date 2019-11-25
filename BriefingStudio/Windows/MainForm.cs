@@ -150,10 +150,10 @@ namespace BriefingStudio
                 if (!text.Contains("$S999"))
                 {
                     append = "$S999\n";
-                }
-                if (!text.EndsWith("\n"))
-                {
-                    append = "\n" + text;
+                    if (!text.EndsWith("\n"))
+                    {
+                        append = "\n" + text;
+                    }
                 }
                 text += append;
             }
