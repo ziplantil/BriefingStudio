@@ -433,8 +433,12 @@ namespace BriefingStudio
             string pcx = backgroundName;
             if (highRes && descentGame == 2)
             {
-                // use highres texture
-                pcx = pcx.Replace(".PCX", "B.PCX");
+                int index = pcx.LastIndexOf(".pcx", StringComparison.InvariantCultureIgnoreCase);
+                if (index >= 0)
+                {
+                    // .B
+                    pcx = pcx.Substring(0, index) + "B.pcx";
+                }
             }
             byte[] pcxTexture = findFile(pcx);
             if (pcxTexture == null)
@@ -444,10 +448,14 @@ namespace BriefingStudio
                 return false;
             }
             backgroundCache = pcxdec.LoadPCX(pcxTexture, out palette);
+            UpdateBriefingColors();
             lock (graphicsLock)
-                graphics.DrawImage(backgroundCache, 0, 0, screen.Width, screen.Height);
+            {
+                graphics.Clear(clearColor);
+                graphics.DrawImage(backgroundCache, 0, 0);
+            }
             return true;
-        }
+        }   
 
         private int NextChar()
         {
