@@ -50,6 +50,7 @@ namespace BriefingStudio
         private Pen helperBorderPen = new Pen(Color.FromArgb(0, 255, 255));
         private Brush placeholderFontBrush = new SolidBrush(Color.FromArgb(255, 0, 0));
         private Font specialFont = new Font("Courier New", 10);
+        private Thread playThread;
 
         public delegate byte[] FindFile(string filename);
         private FindFile findFile;
@@ -371,6 +372,12 @@ namespace BriefingStudio
                 return;
             }
 
+            if (playing)
+            {
+                Stop();
+                playThread.Join();
+            }
+
             if (descentGame == 1)
             {
                 // get text for before level #N
@@ -426,12 +433,13 @@ namespace BriefingStudio
 
             rendering = true;
 
-            new Thread(() =>
+            (playThread = new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
                 NewPage(false);
                 MainLoop();
-            }).Start();
+                playThread = null;
+            })).Start();
         }
 
         public void Stop()
