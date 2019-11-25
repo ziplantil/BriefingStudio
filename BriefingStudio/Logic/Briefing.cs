@@ -371,8 +371,8 @@ namespace BriefingStudio
                     graphics.Clear(Color.Black);
                 return;
             }
-
-            if (playing)
+            
+            if (playing && playThread != null)
             {
                 Stop();
                 playThread.Join();
