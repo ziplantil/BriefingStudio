@@ -45,6 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Windows\BannerCreatorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Windows\BannerCreatorForm.Designer.cs">
+      <DependentUpon>BannerCreatorForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Logic\Briefing.cs" />
     <Compile Include="Logic\EveryFrameEventHandler.cs" />
     <Compile Include="Logic\Formats\FNTFont.cs" />
@@ -98,6 +104,9 @@
     <Compile Include="Windows\TXBSyntaxHelpForm.Designer.cs">
       <DependentUpon>TXBSyntaxHelpForm.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Windows\BannerCreatorForm.resx">
+      <DependentUpon>BannerCreatorForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Windows\HighResScreenForm.resx">
       <DependentUpon>HighResScreenForm.cs</DependentUpon>
     </EmbeddedResource>

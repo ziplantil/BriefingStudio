@@ -573,6 +573,8 @@ namespace BriefingStudio
         {
             lock (graphicsLock)
             {
+                NewPage(false);
+
                 graphics.Clear(Color.Black);
                 MoveText(0, 0);
                 string text = "END OF BRIEFING.";

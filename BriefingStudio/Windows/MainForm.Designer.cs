@@ -49,6 +49,8 @@
             this.playingBriefingLabel = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
+            this.pointlessButton = new System.Windows.Forms.Button();
+            this.bannerGeneratorButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.levelNumericUpDown)).BeginInit();
             this.SuspendLayout();
             // 
@@ -88,7 +90,7 @@
             // 
             // lowResScreenButton
             // 
-            this.lowResScreenButton.Location = new System.Drawing.Point(0, 106);
+            this.lowResScreenButton.Location = new System.Drawing.Point(0, 120);
             this.lowResScreenButton.Name = "lowResScreenButton";
             this.lowResScreenButton.Size = new System.Drawing.Size(142, 23);
             this.lowResScreenButton.TabIndex = 3;
@@ -98,7 +100,7 @@
             // 
             // highResScreenButton
             // 
-            this.highResScreenButton.Location = new System.Drawing.Point(148, 106);
+            this.highResScreenButton.Location = new System.Drawing.Point(148, 120);
             this.highResScreenButton.Name = "highResScreenButton";
             this.highResScreenButton.Size = new System.Drawing.Size(142, 23);
             this.highResScreenButton.TabIndex = 4;
@@ -109,7 +111,7 @@
             // baseHogLabel
             // 
             this.baseHogLabel.AutoSize = true;
-            this.baseHogLabel.Location = new System.Drawing.Point(-3, 221);
+            this.baseHogLabel.Location = new System.Drawing.Point(-3, 235);
             this.baseHogLabel.Name = "baseHogLabel";
             this.baseHogLabel.Size = new System.Drawing.Size(152, 13);
             this.baseHogLabel.TabIndex = 5;
@@ -137,7 +139,7 @@
             // 
             // playBriefingButton
             // 
-            this.playBriefingButton.Location = new System.Drawing.Point(0, 135);
+            this.playBriefingButton.Location = new System.Drawing.Point(0, 149);
             this.playBriefingButton.Name = "playBriefingButton";
             this.playBriefingButton.Size = new System.Drawing.Size(142, 23);
             this.playBriefingButton.TabIndex = 12;
@@ -148,7 +150,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(-3, 170);
+            this.label1.Location = new System.Drawing.Point(-3, 184);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(56, 13);
             this.label1.TabIndex = 14;
@@ -156,7 +158,7 @@
             // 
             // levelNumericUpDown
             // 
-            this.levelNumericUpDown.Location = new System.Drawing.Point(66, 168);
+            this.levelNumericUpDown.Location = new System.Drawing.Point(66, 182);
             this.levelNumericUpDown.Maximum = new decimal(new int[] {
             127,
             0,
@@ -169,7 +171,7 @@
             // 
             // stopBriefingButton
             // 
-            this.stopBriefingButton.Location = new System.Drawing.Point(148, 135);
+            this.stopBriefingButton.Location = new System.Drawing.Point(148, 149);
             this.stopBriefingButton.Name = "stopBriefingButton";
             this.stopBriefingButton.Size = new System.Drawing.Size(142, 23);
             this.stopBriefingButton.TabIndex = 16;
@@ -201,7 +203,7 @@
             // workingHogLabel
             // 
             this.workingHogLabel.AutoSize = true;
-            this.workingHogLabel.Location = new System.Drawing.Point(-3, 245);
+            this.workingHogLabel.Location = new System.Drawing.Point(-3, 259);
             this.workingHogLabel.Name = "workingHogLabel";
             this.workingHogLabel.Size = new System.Drawing.Size(130, 13);
             this.workingHogLabel.TabIndex = 19;
@@ -210,7 +212,7 @@
             // playingBriefingLabel
             // 
             this.playingBriefingLabel.AutoSize = true;
-            this.playingBriefingLabel.Location = new System.Drawing.Point(-3, 267);
+            this.playingBriefingLabel.Location = new System.Drawing.Point(-3, 281);
             this.playingBriefingLabel.Name = "playingBriefingLabel";
             this.playingBriefingLabel.Size = new System.Drawing.Size(24, 13);
             this.playingBriefingLabel.TabIndex = 20;
@@ -219,7 +221,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(145, 162);
+            this.label3.Location = new System.Drawing.Point(145, 176);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(74, 39);
             this.label3.TabIndex = 21;
@@ -235,11 +237,32 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // pointlessButton
+            // 
+            this.pointlessButton.Location = new System.Drawing.Point(148, 91);
+            this.pointlessButton.Name = "pointlessButton";
+            this.pointlessButton.Size = new System.Drawing.Size(142, 23);
+            this.pointlessButton.TabIndex = 23;
+            this.pointlessButton.Text = "Button";
+            this.pointlessButton.UseVisualStyleBackColor = true;
+            // 
+            // bannerGeneratorButton
+            // 
+            this.bannerGeneratorButton.Location = new System.Drawing.Point(0, 90);
+            this.bannerGeneratorButton.Name = "bannerGeneratorButton";
+            this.bannerGeneratorButton.Size = new System.Drawing.Size(142, 23);
+            this.bannerGeneratorButton.TabIndex = 24;
+            this.bannerGeneratorButton.Text = "Banner Generator";
+            this.bannerGeneratorButton.UseVisualStyleBackColor = true;
+            this.bannerGeneratorButton.Click += new System.EventHandler(this.bannerGeneratorButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(294, 289);
+            this.ClientSize = new System.Drawing.Size(294, 300);
+            this.Controls.Add(this.bannerGeneratorButton);
+            this.Controls.Add(this.pointlessButton);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.playingBriefingLabel);
@@ -290,6 +313,8 @@
         private System.Windows.Forms.Label playingBriefingLabel;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button pointlessButton;
+        private System.Windows.Forms.Button bannerGeneratorButton;
     }
 }
 

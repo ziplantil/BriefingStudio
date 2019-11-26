@@ -13,6 +13,7 @@ namespace BriefingStudio
         private HighResScreenForm highres = new HighResScreenForm();
         private TXBEditorForm editor = new TXBEditorForm();
         private SettingsForm settingsForm = new SettingsForm();
+        private BannerCreatorForm bannerCreatorForm = new BannerCreatorForm();
         private Briefing bl = null;
         private Briefing bh = null;
         private int descentGame;
@@ -273,6 +274,11 @@ namespace BriefingStudio
 
         private byte[] FindFile(string fileName)
         {
+            if (baseHog == null)
+            {
+                return null;
+            }
+
             byte[] file = null;
             if (workingHog != null)
             {
@@ -357,6 +363,13 @@ namespace BriefingStudio
         {
             settingsForm.Show();
             settingsForm.BringToFront();
+        }
+
+        private void bannerGeneratorButton_Click(object sender, EventArgs e)
+        {
+            bannerCreatorForm.SetFindFile(FindFile);
+            bannerCreatorForm.Show();
+            bannerCreatorForm.BringToFront();
         }
     }
 }

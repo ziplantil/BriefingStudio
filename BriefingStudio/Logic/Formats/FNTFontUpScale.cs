@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
 namespace BriefingStudio
 {
     public class FNTFontUpScale : FNTFont
     {
+        Bitmap frame = null;
+        Graphics frameGraphics;
+        Rectangle frameRect;
+
         public FNTFontUpScale(FNTFont font) : base(font)
         {
         }
@@ -13,61 +18,43 @@ namespace BriefingStudio
 
         public override void DrawCharacterRaw(Bitmap b, char c, Color clr, ref int x, int y)
         {
-            int thisWidth = GetCharWidth(c);
-
             if (IsCharInFont(c))
             {
-                byte[] charData = fontData[c - minchar];
-
-                BitmapData data = b.LockBits(new Rectangle(x, y, thisWidth * 2, cheight * 2), System.Drawing.Imaging.ImageLockMode.ReadWrite, b.PixelFormat);
-                byte cr = clr.R;
-                byte cg = clr.G;
-                byte cb = clr.B;
-
-                int cptr = 0;
-                IntPtr ptr = data.Scan0;
-                int bytes = Math.Abs(data.Stride) * cheight * 2;
-                byte[] rgbValues = new byte[bytes];
-                System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
-
-                for (int yo = 0; yo < cheight; ++yo)
+                // call DrawCharacterRaw and upscale
+                if (frame == null)
                 {
-                    int p = yo * 2 * data.Stride;
-                    int q = (yo * 2 + 1) * data.Stride;
-                    for (int xo = 0; xo < thisWidth; xo += 8)
-                    {
-                        byte sliver = charData[cptr++];
-                        for (int xs = 0; xs < 8; ++xs)
-                        {
-                            if (xo + xs >= thisWidth)
-                                break;
-                            if ((sliver & 0x80) != 0)
-                            {
-                                rgbValues[p + (xo + xs) * 6] = cb;
-                                rgbValues[p + (xo + xs) * 6 + 1] = cg;
-                                rgbValues[p + (xo + xs) * 6 + 2] = cr;
-                                rgbValues[p + (xo + xs) * 6 + 3] = cb;
-                                rgbValues[p + (xo + xs) * 6 + 4] = cg;
-                                rgbValues[p + (xo + xs) * 6 + 5] = cr;
-                                rgbValues[q + (xo + xs) * 6] = cb;
-                                rgbValues[q + (xo + xs) * 6 + 1] = cg;
-                                rgbValues[q + (xo + xs) * 6 + 2] = cr;
-                                rgbValues[q + (xo + xs) * 6 + 3] = cb;
-                                rgbValues[q + (xo + xs) * 6 + 4] = cg;
-                                rgbValues[q + (xo + xs) * 6 + 5] = cr;
-                            }
-                            sliver <<= 1;
-                        }
-                    }
+                    frame = new Bitmap(this.cwidth * 4, this.cheight, PixelFormat.Format32bppArgb);
+                    frameGraphics = Graphics.FromImage(frame);
+                    frameRect = new Rectangle(new Point(0, 0), frame.Size);
                 }
+                frameGraphics.Clear(Color.Transparent);
+                int ox = 0;
 
-                System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
-                b.UnlockBits(data);
+                base.DrawCharacterRaw(frame, c, clr, ref ox, 0);
+                if (ox > 0)
+                {
+                    using (Graphics g = Graphics.FromImage(b))
+                    {
+                        g.InterpolationMode = InterpolationMode.NearestNeighbor;    
+                        g.DrawImage(frame, new Rectangle(x, y, frame.Width * 2 + 1, frame.Height * 2 + 1), frameRect, GraphicsUnit.Pixel);
+                    }
+                    x += ox * 2;
+                }
             }
+        }
 
-            x += thisWidth * 2;
-            x += GetKernOffset(c) * 2;
-            lastChar = c;
+        public override void DrawCharacter(Bitmap b, char c, Color fg, Color bg, ref int x, int y, bool shadow)
+        {
+            if (shadow)
+            {
+                int dummy = x + 2;
+                DrawCharacterRaw(b, c, bg, ref x, y);
+                DrawCharacterRaw(b, c, fg, ref dummy, y);
+            }
+            else
+            {
+                DrawCharacterRaw(b, c, fg, ref x, y);
+            }
         }
     }
 }

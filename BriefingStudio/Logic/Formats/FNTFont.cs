@@ -19,6 +19,8 @@ namespace BriefingStudio
         protected bool isProportional;
         protected bool hasKerning;
         protected char lastChar;
+        protected bool colored;
+        protected readonly byte[] palette;
 
         public FNTFont(FNTFont font)
         {
@@ -32,6 +34,8 @@ namespace BriefingStudio
             this.kerns = font.kerns;
             this.isProportional = font.isProportional;
             this.hasKerning = font.hasKerning;
+            this.colored = font.colored;
+            this.palette = font.palette;
         }
 
         public FNTFont(Stream stream)
@@ -46,8 +50,8 @@ namespace BriefingStudio
                 cwidth = br.ReadInt16();
                 cheight = br.ReadInt16();
                 flags = br.ReadInt16();
-                if ((flags & 1) != 0)
-                    throw new ArgumentException("color fonts are not supported");
+                colored = (flags & 1) != 0;
+                palette = colored ? new byte[768] : null;
 
                 isProportional = (flags & 2) != 0;
                 hasKerning = (flags & 4) != 0;
@@ -102,8 +106,14 @@ namespace BriefingStudio
                 stream.Seek(dataPointer, SeekOrigin.Begin);
                 for (int i = 0; i < charCount; ++i)
                 {
-                    int byteWidth = (widths[i] + 7) / 8;
+                    int byteWidth = colored ? widths[i] : (widths[i] + 7) / 8;
                     fontData[i] = br.ReadBytes(byteWidth * cheight);
+                }
+
+                if (colored)
+                {
+                    stream.Seek(-palette.Length, SeekOrigin.End);
+                    palette = br.ReadBytes(palette.Length);
                 }
             }
             ResetKerning();
@@ -131,7 +141,12 @@ namespace BriefingStudio
             }
         }
 
-        public int GetKernOffset(char c)
+        public int GetCharHeight()
+        {
+            return cheight;
+        }
+
+        private int GetKernOffset(char c)
         {
             int kernIndex = (lastChar << 8) + c;
             if (hasKerning && kerns.ContainsKey(kernIndex))
@@ -142,6 +157,24 @@ namespace BriefingStudio
             {
                 return 0;
             }
+        }
+
+        public virtual int MeasureWidth(string s)
+        {
+            char oldLastChar = lastChar;
+            int x = 0, w;
+
+            ResetKerning();
+            foreach (char c in s)
+            {
+                w = GetCharWidth(c);
+                x += w;
+                x += GetKernOffset(c);
+                lastChar = c;
+            }
+
+            lastChar = oldLastChar;
+            return x;
         }
 
         public virtual void DrawCharacterRaw(Bitmap b, char c, Color clr, ref int x, int y)
@@ -179,7 +212,25 @@ namespace BriefingStudio
                     y -= removeBottomY;
                 }
 
-                BitmapData data = b.LockBits(new Rectangle(x, y, thisWidth, cheight), System.Drawing.Imaging.ImageLockMode.ReadWrite, b.PixelFormat);
+                if (cwidth - removeLeftX - removeRightX <= 0 || cheight - removeTopY - removeBottomY <= 0)
+                    return;
+
+                BitmapData data = b.LockBits(new Rectangle(x, y, thisWidth - removeRightX, cheight - removeBottomY), System.Drawing.Imaging.ImageLockMode.ReadWrite, b.PixelFormat);
+                bool alpha = false;
+
+                if (b.PixelFormat == PixelFormat.Format24bppRgb)
+                {
+                    alpha = false;
+                }
+                else if (b.PixelFormat == PixelFormat.Format32bppArgb)
+                {
+                    alpha = true;
+                }
+                else
+                {
+                    throw new FormatException("Unsupported pixel format: " + b.PixelFormat.ToString());
+                }
+                int fac = alpha ? 4 : 3;
 
                 byte cr = clr.R;
                 byte cg = clr.G;
@@ -194,20 +245,40 @@ namespace BriefingStudio
                 for (int yo = removeTopY; yo < cheight - removeBottomY; ++yo)
                 {
                     int p = yo * data.Stride;
-                    for (int xo = removeLeftX; xo < thisWidth - removeRightX; xo += 8)
+                    if (colored)
                     {
-                        byte sliver = charData[cptr++];
-                        for (int xs = 0; xs < 8; ++xs)
+                        for (int xo = removeLeftX; xo < thisWidth - removeRightX; ++xo)
                         {
-                            if (xo + xs >= thisWidth)
-                                break;
-                            if ((sliver & 0x80) != 0)
+                            byte color = charData[cptr++];
+                            if (color < 255)
                             {
-                                rgbValues[p + (xo + xs) * 3] = cb;
-                                rgbValues[p + (xo + xs) * 3 + 1] = cg;
-                                rgbValues[p + (xo + xs) * 3 + 2] = cr;
+                                rgbValues[p + xo * fac] = (byte)(palette[color * 3 + 2] << 2);
+                                rgbValues[p + xo * fac + 1] = (byte)(palette[color * 3 + 1] << 2);
+                                rgbValues[p + xo * fac + 2] = (byte)(palette[color * 3] << 2);
+                                if (alpha)
+                                    rgbValues[p + xo * fac + 3] = 255;
                             }
-                            sliver <<= 1;
+                        }
+                    }
+                    else
+                    {
+                        for (int xo = removeLeftX; xo < thisWidth - removeRightX; xo += 8)
+                        {
+                            byte sliver = charData[cptr++];
+                            for (int xs = 0; xs < 8; ++xs)
+                            {
+                                if (xo + xs >= thisWidth)
+                                    break;
+                                if ((sliver & 0x80) != 0)
+                                {
+                                    rgbValues[p + (xo + xs) * fac] = cb;
+                                    rgbValues[p + (xo + xs) * fac + 1] = cg;
+                                    rgbValues[p + (xo + xs) * fac + 2] = cr;
+                                    if (alpha)
+                                        rgbValues[p + (xo + xs) * fac + 3] = 255;
+                                }
+                                sliver <<= 1;
+                            }
                         }
                     }
                 }
@@ -221,7 +292,7 @@ namespace BriefingStudio
             lastChar = c;
         }
 
-        public void DrawCharacter(Bitmap b, char c, Color fg, Color bg, ref int x, int y, bool shadow)
+        public virtual void DrawCharacter(Bitmap b, char c, Color fg, Color bg, ref int x, int y, bool shadow)
         {
             if (shadow)
             {
