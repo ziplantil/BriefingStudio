@@ -503,7 +503,7 @@ namespace BriefingStudio
                 sw.Start();
             }
 
-            while (!keyPress)
+            while (playing && !keyPress)
             {
                 // try cursor flash
                 if (briefingFGcols != null && cursorFlash)

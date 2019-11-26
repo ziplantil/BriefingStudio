@@ -81,7 +81,7 @@
             // 
             // bannerSaveFileDialog
             // 
-            this.bannerSaveFileDialog.Filter = "Bitmap files (*.BMP)|*.BMP";
+            this.bannerSaveFileDialog.Filter = "PNG files (*.PNG)|*.PNG|Bitmap files (*.BMP)|*.BMP|All files|*.*";
             this.bannerSaveFileDialog.RestoreDirectory = true;
             this.bannerSaveFileDialog.Title = "Save banner to";
             this.bannerSaveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.bannerSaveFileDialog_FileOk);
@@ -99,6 +99,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MinimizeBox = false;
             this.Name = "BannerCreatorForm";
+            this.ShowIcon = false;
             this.Text = "Descent font banner creator";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.BannerCreatorForm_FormClosing);
             this.ResumeLayout(false);

@@ -51,6 +51,7 @@
             this.button3 = new System.Windows.Forms.Button();
             this.pointlessButton = new System.Windows.Forms.Button();
             this.bannerGeneratorButton = new System.Windows.Forms.Button();
+            this.infoLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.levelNumericUpDown)).BeginInit();
             this.SuspendLayout();
             // 
@@ -110,8 +111,9 @@
             // 
             // baseHogLabel
             // 
+            this.baseHogLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.baseHogLabel.AutoSize = true;
-            this.baseHogLabel.Location = new System.Drawing.Point(-3, 235);
+            this.baseHogLabel.Location = new System.Drawing.Point(-3, 231);
             this.baseHogLabel.Name = "baseHogLabel";
             this.baseHogLabel.Size = new System.Drawing.Size(152, 13);
             this.baseHogLabel.TabIndex = 5;
@@ -202,8 +204,9 @@
             // 
             // workingHogLabel
             // 
+            this.workingHogLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.workingHogLabel.AutoSize = true;
-            this.workingHogLabel.Location = new System.Drawing.Point(-3, 259);
+            this.workingHogLabel.Location = new System.Drawing.Point(-3, 255);
             this.workingHogLabel.Name = "workingHogLabel";
             this.workingHogLabel.Size = new System.Drawing.Size(130, 13);
             this.workingHogLabel.TabIndex = 19;
@@ -211,8 +214,9 @@
             // 
             // playingBriefingLabel
             // 
+            this.playingBriefingLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.playingBriefingLabel.AutoSize = true;
-            this.playingBriefingLabel.Location = new System.Drawing.Point(-3, 281);
+            this.playingBriefingLabel.Location = new System.Drawing.Point(-3, 277);
             this.playingBriefingLabel.Name = "playingBriefingLabel";
             this.playingBriefingLabel.Size = new System.Drawing.Size(24, 13);
             this.playingBriefingLabel.TabIndex = 20;
@@ -256,11 +260,22 @@
             this.bannerGeneratorButton.UseVisualStyleBackColor = true;
             this.bannerGeneratorButton.Click += new System.EventHandler(this.bannerGeneratorButton_Click);
             // 
+            // infoLabel
+            // 
+            this.infoLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.infoLabel.Location = new System.Drawing.Point(205, 277);
+            this.infoLabel.Name = "infoLabel";
+            this.infoLabel.Size = new System.Drawing.Size(85, 19);
+            this.infoLabel.TabIndex = 25;
+            this.infoLabel.Text = "ziplantil 2019";
+            this.infoLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(294, 300);
+            this.ClientSize = new System.Drawing.Size(294, 294);
+            this.Controls.Add(this.infoLabel);
             this.Controls.Add(this.bannerGeneratorButton);
             this.Controls.Add(this.pointlessButton);
             this.Controls.Add(this.button3);
@@ -315,6 +330,7 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button pointlessButton;
         private System.Windows.Forms.Button bannerGeneratorButton;
+        private System.Windows.Forms.Label infoLabel;
     }
 }
 

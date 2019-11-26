@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace BriefingStudio
 {
@@ -21,6 +22,9 @@ namespace BriefingStudio
         protected char lastChar;
         protected bool colored;
         protected readonly byte[] palette;
+        protected Bitmap buffer;
+        protected Graphics bufferGraphics;
+        protected Rectangle bufferRect;
 
         public FNTFont(FNTFont font)
         {
@@ -36,6 +40,9 @@ namespace BriefingStudio
             this.hasKerning = font.hasKerning;
             this.colored = font.colored;
             this.palette = font.palette;
+            this.buffer = new Bitmap(font.buffer);
+            this.bufferGraphics = Graphics.FromImage(this.buffer);
+            this.bufferRect = new Rectangle(new Point(0, 0), this.buffer.Size);
         }
 
         public FNTFont(Stream stream)
@@ -84,6 +91,15 @@ namespace BriefingStudio
                         widths[i] = cwidth;
                     }
                 }
+
+                int maxWidth = cwidth;
+                for (int i = 0; i < charCount; ++i)
+                {
+                    maxWidth = Math.Max(widths[i], maxWidth);
+                }
+                buffer = new Bitmap(maxWidth, cheight, PixelFormat.Format32bppArgb);
+                bufferGraphics = Graphics.FromImage(buffer);
+                bufferRect = new Rectangle(new Point(0, 0), this.buffer.Size);
 
                 if (hasKerning)
                 {
@@ -174,9 +190,10 @@ namespace BriefingStudio
             }
 
             lastChar = oldLastChar;
-            return x;
+            return x + 1;
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public virtual void DrawCharacterRaw(Bitmap b, char c, Color clr, ref int x, int y)
         {
             int thisWidth = GetCharWidth(c);
@@ -184,53 +201,11 @@ namespace BriefingStudio
             if (IsCharInFont(c))
             {
                 byte[] charData = fontData[c - minchar];
-
-                Size imageSize = b.Size;
-
-                int removeLeftX = 0;
-                int removeRightX = 0;
-                int removeTopY = 0;
-                int removeBottomY = 0;
-                if (x < 0)
-                {
-                    removeLeftX = -x;
-                    x = 0;
-                }
-                if (y < 0)
-                {
-                    removeTopY = -y;
-                    y = 0;
-                }
-                if (x + thisWidth > imageSize.Width)
-                {
-                    removeRightX = (x + thisWidth) - imageSize.Width;
-                    x -= removeRightX;
-                }
-                if (y + cheight > imageSize.Height)
-                {
-                    removeBottomY = (y + cheight) - imageSize.Height;
-                    y -= removeBottomY;
-                }
-
-                if (cwidth - removeLeftX - removeRightX <= 0 || cheight - removeTopY - removeBottomY <= 0)
+                if (x < -thisWidth || x > b.Width || y < -cheight || y > b.Height)
                     return;
 
-                BitmapData data = b.LockBits(new Rectangle(x, y, thisWidth - removeRightX, cheight - removeBottomY), System.Drawing.Imaging.ImageLockMode.ReadWrite, b.PixelFormat);
-                bool alpha = false;
-
-                if (b.PixelFormat == PixelFormat.Format24bppRgb)
-                {
-                    alpha = false;
-                }
-                else if (b.PixelFormat == PixelFormat.Format32bppArgb)
-                {
-                    alpha = true;
-                }
-                else
-                {
-                    throw new FormatException("Unsupported pixel format: " + b.PixelFormat.ToString());
-                }
-                int fac = alpha ? 4 : 3;
+                bufferGraphics.Clear(Color.Transparent);
+                BitmapData data = buffer.LockBits(bufferRect, System.Drawing.Imaging.ImageLockMode.ReadWrite, buffer.PixelFormat);
 
                 byte cr = clr.R;
                 byte cg = clr.G;
@@ -238,31 +213,30 @@ namespace BriefingStudio
 
                 int cptr = 0;
                 IntPtr ptr = data.Scan0;
-                int bytes = Math.Abs(data.Stride) * (cheight - removeTopY - removeBottomY);
+                int bytes = data.Stride * data.Height;
                 byte[] rgbValues = new byte[bytes];
                 System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
 
-                for (int yo = removeTopY; yo < cheight - removeBottomY; ++yo)
+                for (int yo = 0; yo < cheight; ++yo)
                 {
                     int p = yo * data.Stride;
                     if (colored)
                     {
-                        for (int xo = removeLeftX; xo < thisWidth - removeRightX; ++xo)
+                        for (int xo = 0; xo < thisWidth; ++xo)
                         {
                             byte color = charData[cptr++];
                             if (color < 255)
                             {
-                                rgbValues[p + xo * fac] = (byte)(palette[color * 3 + 2] << 2);
-                                rgbValues[p + xo * fac + 1] = (byte)(palette[color * 3 + 1] << 2);
-                                rgbValues[p + xo * fac + 2] = (byte)(palette[color * 3] << 2);
-                                if (alpha)
-                                    rgbValues[p + xo * fac + 3] = 255;
+                                rgbValues[p + xo * 4] = (byte)(palette[color * 3 + 2] << 2);
+                                rgbValues[p + xo * 4 + 1] = (byte)(palette[color * 3 + 1] << 2);
+                                rgbValues[p + xo * 4 + 2] = (byte)(palette[color * 3] << 2);
+                                rgbValues[p + xo * 4 + 3] = 255;
                             }
                         }
                     }
                     else
                     {
-                        for (int xo = removeLeftX; xo < thisWidth - removeRightX; xo += 8)
+                        for (int xo = 0; xo < thisWidth; xo += 8)
                         {
                             byte sliver = charData[cptr++];
                             for (int xs = 0; xs < 8; ++xs)
@@ -271,11 +245,10 @@ namespace BriefingStudio
                                     break;
                                 if ((sliver & 0x80) != 0)
                                 {
-                                    rgbValues[p + (xo + xs) * fac] = cb;
-                                    rgbValues[p + (xo + xs) * fac + 1] = cg;
-                                    rgbValues[p + (xo + xs) * fac + 2] = cr;
-                                    if (alpha)
-                                        rgbValues[p + (xo + xs) * fac + 3] = 255;
+                                    rgbValues[p + (xo + xs) * 4] = cb;
+                                    rgbValues[p + (xo + xs) * 4 + 1] = cg;
+                                    rgbValues[p + (xo + xs) * 4 + 2] = cr;
+                                    rgbValues[p + (xo + xs) * 4 + 3] = 255;
                                 }
                                 sliver <<= 1;
                             }
@@ -284,7 +257,10 @@ namespace BriefingStudio
                 }
 
                 System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
-                b.UnlockBits(data);
+                buffer.UnlockBits(data);
+
+                // blit
+                Graphics.FromImage(b).DrawImage(buffer, x, y);
             }
 
             x += thisWidth;
