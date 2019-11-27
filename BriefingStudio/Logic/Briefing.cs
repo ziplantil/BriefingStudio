@@ -317,7 +317,12 @@ namespace BriefingStudio
             while ((newIndex = text.IndexOf("$S", index)) >= 0)
             {
                 int endIndex = text.IndexOf('\n', newIndex);
+                if (endIndex < 0) endIndex = text.Length;
                 int numIndex = newIndex + 2;
+                if (numIndex == endIndex)
+                {
+                    break;
+                }
                 string number = text.Substring(numIndex, endIndex - numIndex).Trim();
                 if (number.Length > 0)
                 {

@@ -34,7 +34,7 @@ namespace BriefingStudio
             int read;
             while (n > 0)
             {
-                read = src.Read(buffer, 0, buffer.Length);
+                read = src.Read(buffer, 0, Math.Min(n, buffer.Length));
                 if (read <= 0)
                 {
                     break;

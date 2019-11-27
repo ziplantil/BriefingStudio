@@ -158,6 +158,7 @@ namespace BriefingStudio
                 }
                 text += append;
             }
+            editor.ModifyText(text.Replace("\n", "\r\n"));
             byte[] txb = TXBConverter.EncodeTXB(text);
             workingHog.PutFile(filename, txb);
         }

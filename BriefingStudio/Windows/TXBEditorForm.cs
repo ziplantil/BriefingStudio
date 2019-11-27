@@ -85,7 +85,6 @@ namespace BriefingStudio
             {
                 saveBriefing(briefingNameTextBox.Text, txbBox.Text);
                 this.Text = "TXB Editor";
-                LoadFile(briefingNameTextBox.Text);
             }
             catch (Exception ex)
             {
@@ -100,7 +99,8 @@ namespace BriefingStudio
 
         private void txbBox_TextChanged(object sender, EventArgs e)
         {
-            this.Text = "TXB Editor (UNSAVED)";
+            if (((TextBox)sender).Modified)
+                this.Text = "TXB Editor (UNSAVED)";
         }
 
         private void syntaxHelpButton_Click(object sender, EventArgs e)
@@ -112,6 +112,14 @@ namespace BriefingStudio
         public void SetDescentGame(int descentGame)
         {
             txbSyntaxHelpForm.SetDescentGame(descentGame);
+        }
+
+        internal void ModifyText(string v)
+        {
+            if (txbBox.Text != v)
+            {
+                txbBox.Text = v;
+            }
         }
     }
 }
