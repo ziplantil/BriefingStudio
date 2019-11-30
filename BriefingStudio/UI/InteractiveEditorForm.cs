@@ -257,6 +257,11 @@ namespace BriefingStudio.UI
             {
                 Screen = null;
             }
+            MaybeUpdatePreview();
+        }
+
+        private void MaybeUpdatePreview()
+        {
             if (Screen != null && toolStripMenuItemAutoPreview.Checked)
             {
                 playBriefing("$S1\n" + Screen.ToBriefing(), 1, true);
@@ -643,10 +648,7 @@ namespace BriefingStudio.UI
         {
             textEditDebounceTimer.Stop();
             UpdateScreenList();
-            if (Screen != null && toolStripMenuItemAutoPreview.Checked)
-            {
-                playBriefing("$S1\n" + Screen.ToBriefing(), 1, true);
-            }
+            MaybeUpdatePreview();
         }
 
         private void toolStripButtonAddScreen_Click(object sender, EventArgs e)
@@ -947,6 +949,11 @@ namespace BriefingStudio.UI
         {
             BriefingStudio.Properties.Settings.Default.autoPreview = toolStripMenuItemAutoPreview.Checked;
             BriefingStudio.Properties.Settings.Default.Save();
+        }
+
+        private void propertyGrid_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            MaybeUpdatePreview();
         }
     }
 }
