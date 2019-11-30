@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 
-namespace BriefingStudio
+namespace BriefingStudio.Logic.Formats
 {
     public class PCXHeader
     {

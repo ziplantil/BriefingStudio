@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace BriefingStudio
+namespace BriefingStudio.Logic.Formats
 {
     class TXBConverter
     {

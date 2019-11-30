@@ -1,12 +1,14 @@
-﻿using System;
+﻿using BriefingStudio.Logic;
+using BriefingStudio.Logic.Formats;
+using System;
 using System.Windows.Forms;
 
-namespace BriefingStudio
+namespace BriefingStudio.UI
 {
     public partial class TXBEditorForm : Form
     {
         public delegate byte[] FindFile(string filename);
-        public delegate void PlayBriefing(string text, int n);
+        public delegate void PlayBriefing(string text, int n, bool instant);
         public delegate void StopBriefing();
         public delegate void SaveBriefing(string filename, string contents);
         private TXBSyntaxHelpForm txbSyntaxHelpForm = new TXBSyntaxHelpForm();
@@ -15,6 +17,8 @@ namespace BriefingStudio
         private PlayBriefing playBriefing;
         private StopBriefing stopBriefing;
         private SaveBriefing saveBriefing;
+        private bool _unsaved;
+        internal bool fromCompile;
 
         public TXBEditorForm()
         {
@@ -29,10 +33,29 @@ namespace BriefingStudio
             this.saveBriefing = saveBriefing;
         }
 
+        public bool Unsaved
+        {
+            get
+            {
+                return _unsaved;
+            }
+            set
+            {
+                _unsaved = value;
+                this.UpdateTitle();
+            }
+        }
+
+        private void UpdateTitle()
+        {
+            this.Text = (Unsaved ? "*" : "") + "TXB Editor";
+        }
+
         private void reloadButton_Click(object sender, EventArgs e)
         {
             LoadFile(briefingNameTextBox.Text);
-            this.Text = "TXB Editor";
+            Unsaved = false;
+            fromCompile = false;
         }
 
         public void LoadFile(string fn)
@@ -50,7 +73,7 @@ namespace BriefingStudio
 
         private void playButton_Click(object sender, EventArgs e)
         {
-            playBriefing(txbBox.Text, (int)sequenceNumericUpDown.Value);
+            playBriefing(txbBox.Text, (int)sequenceNumericUpDown.Value, false);
         }
 
         private void jumpButton_Click(object sender, EventArgs e)
@@ -84,7 +107,7 @@ namespace BriefingStudio
             try
             {
                 saveBriefing(briefingNameTextBox.Text, txbBox.Text);
-                this.Text = "TXB Editor";
+                Unsaved = false;
             }
             catch (Exception ex)
             {
@@ -94,13 +117,24 @@ namespace BriefingStudio
 
         private void TXBEditorForm_Load(object sender, EventArgs e)
         {
-            this.Text = "TXB Editor";
+            Unsaved = false;
+            fromCompile = false;
         }
 
         private void txbBox_TextChanged(object sender, EventArgs e)
         {
             if (((TextBox)sender).Modified)
-                this.Text = "TXB Editor (UNSAVED)";
+            {
+                Unsaved = true;
+                fromCompile = false;
+            }
+        }
+
+        internal void ImportText(string text)
+        {
+            Unsaved = true;
+            fromCompile = true;
+            txbBox.Text = text;
         }
 
         private void syntaxHelpButton_Click(object sender, EventArgs e)

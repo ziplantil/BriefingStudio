@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace BriefingStudio
+namespace BriefingStudio.Logic.Formats
 {
     internal static class Utils
     {

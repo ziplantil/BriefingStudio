@@ -1,6 +1,6 @@
-﻿namespace BriefingStudio
+﻿namespace BriefingStudio.UI
 {
-    partial class LowResScreenForm
+    partial class HighResScreenForm
     {
         /// <summary>
         /// Required designer variable.
@@ -38,22 +38,22 @@
             this.screen.Dock = System.Windows.Forms.DockStyle.Fill;
             this.screen.Location = new System.Drawing.Point(0, 0);
             this.screen.Name = "screen";
-            this.screen.Size = new System.Drawing.Size(320, 200);
+            this.screen.Size = new System.Drawing.Size(640, 480);
             this.screen.TabIndex = 0;
             this.screen.TabStop = false;
             // 
-            // LowResScreenForm
+            // HighResScreenForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(320, 200);
+            this.ClientSize = new System.Drawing.Size(640, 480);
             this.Controls.Add(this.screen);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
-            this.Name = "LowResScreenForm";
+            this.Name = "HighResScreenForm";
             this.ShowIcon = false;
-            this.Text = "Low-Resolution (320x200)";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.LowResScreenForm_FormClosing);
+            this.Text = "High-Resolution (640x480)";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.HighResScreenForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.screen)).EndInit();
             this.ResumeLayout(false);
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BriefingStudio.Logic.Formats;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -6,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace BriefingStudio
+namespace BriefingStudio.Logic
 {
     class Briefing
     {
@@ -34,6 +35,7 @@ namespace BriefingStudio
         private volatile bool playing;
         private volatile bool keyPress;
         private volatile bool rendering;
+        private volatile bool interrupted;
         private List<BriefingScreen> screens;
         private int sequence;
         private int screenNum;
@@ -50,7 +52,9 @@ namespace BriefingStudio
         private Pen helperBorderPen = new Pen(Color.FromArgb(0, 255, 255));
         private Brush placeholderFontBrush = new SolidBrush(Color.FromArgb(255, 0, 0));
         private Font specialFont = new Font("Courier New", 10);
-        private Thread playThread;
+        private volatile Thread playThread;
+        private bool hurryUp;
+        private volatile Object playLock = new object();
 
         public delegate byte[] FindFile(string filename);
         private FindFile findFile;
@@ -85,6 +89,12 @@ namespace BriefingStudio
 
         private void UpdateBriefingColors()
         {
+            if (palette == null)
+            {
+                playing = false;
+                return;
+            }
+
             clearColor = pcxdec.ClosestColor(palette, Color.Black);
             int i = 0;
             bool dxx = Properties.Settings.Default.allowD2XColors;
@@ -144,6 +154,18 @@ namespace BriefingStudio
 
         public void Load(string text)
         {
+            lock (playLock)
+            {
+                if (playing && playThread != null)
+                {
+                    interrupted = true;
+                    Stop();
+                    GotKey();
+                    playThread?.Interrupt();
+                    playThread?.Join(1000);
+                    playThread?.Abort();
+                }
+            }
             backgroundCache = null;
             briefingColor = 0;
             fullText = RemoveComments(text).Replace("\r", "");
@@ -267,7 +289,7 @@ namespace BriefingStudio
             textIndex = ReadNumberSpace(text, textIndex, out n);
             if (n >= 60)
             {
-                MessageBox.Show(null, "Maximum screen index $D is 59", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowText("Invalid screen #" + n + " > 59");
                 playing = false;
                 return 0;
             }
@@ -368,89 +390,110 @@ namespace BriefingStudio
             ty = y;
         }
 
-        public void Play(int sequence)
+        public void Play(int sequence, bool instant)
         {
-            if (fullText == null)
+            lock (playLock)
             {
-                lock (graphicsLock)
-                    graphics.Clear(Color.Black);
-                return;
-            }
-            
-            if (playing && playThread != null)
-            {
-                Stop();
-                playThread.Join();
-            }
-
-            if (descentGame == 1)
-            {
-                // get text for before level #N
-                int firstSequence = -1;
-                int firstNonSequence = screens.Count;
-
-                for (int i = 0; i < screens.Count; ++i)
+                interrupted = false;
+                if (fullText == null)
                 {
-                    if (firstSequence < 0 && screens[i].level == sequence)
-                    {
-                        firstSequence = i;
-                    }
-                    else if (firstSequence >= 0 && screens[i].level != sequence)
-                    {
-                        firstNonSequence = i;
-                        break;
-                    }
+                    lock (graphicsLock)
+                        graphics.Clear(Color.Black);
+                    return;
                 }
 
-                if (firstSequence > 40)
+                if (playing && playThread != null)
                 {
-                    firstSequence -= 40;
-                    if (firstNonSequence > 40) firstNonSequence -= 40;
+                    interrupted = true;
+                    Stop();
+                    GotKey();
+                    playThread?.Interrupt();
+                    playThread?.Join(1000);
+                    playThread?.Abort();
                 }
+                interrupted = false;
 
-                if (firstSequence >= 0)
+                if (descentGame == 1)
                 {
-                    text = GetSequencesText(firstSequence + 1, firstNonSequence + 1);
+                    // get text for before level #N
+                    int firstSequence = -1;
+                    int firstNonSequence = screens.Count;
+
+                    for (int i = 0; i < screens.Count; ++i)
+                    {
+                        if (firstSequence < 0 && screens[i].level == sequence)
+                        {
+                            firstSequence = i;
+                        }
+                        else if (firstSequence >= 0 && screens[i].level != sequence)
+                        {
+                            firstNonSequence = i;
+                            break;
+                        }
+                    }
+
+                    if (firstSequence > 40)
+                    {
+                        firstSequence -= 40;
+                        if (firstNonSequence > 40) firstNonSequence -= 40;
+                    }
+
+                    if (firstSequence >= 0)
+                    {
+                        text = GetSequencesText(firstSequence + 1, firstNonSequence + 1);
+                    }
+                    else
+                    {
+                        text = "";
+                    }
+                    screenNum = firstSequence;
+                    if (screenNum < 0 || screenNum >= screens.Count)
+                    {
+                        return;
+                    }
                 }
                 else
                 {
-                    text = "";
+                    // get text for sequence number #N
+                    text = GetSequenceText(sequence);
+                    screenNum = 0;
                 }
-                screenNum = firstSequence;
-                if (screenNum < 0 || screenNum >= screens.Count)
+                textIndex = 0;
+                playing = true;
+                hurryUp = instant;
+                this.sequence = sequence;
+                backgroundName = screens[screenNum].bsName;
+
+                briefingColor = 0;
+                tabStop = 0;
+
+                rendering = true;
+
+                (playThread = new Thread(() =>
                 {
-                    return;
-                }
+                    Thread.CurrentThread.IsBackground = true;
+                    Thread.CurrentThread.Name = "BriefingPlayThread" + (highRes ? "HighRes" : "LowRes");
+                    NewPage(false);
+                    try
+                    {
+                        MainLoop();
+                    }
+                    catch (Exception)
+                    {
+                        // ignore any and all errors here because they might be caused by another thread stopping
+                    }
+                    playThread = null;
+                })).Start();
             }
-            else
-            {
-                // get text for sequence number #N
-                text = GetSequenceText(sequence);
-                screenNum = 0;
-            }
-            textIndex = 0;
-            playing = true;
-            this.sequence = sequence;
-            backgroundName = screens[screenNum].bsName;
-
-            briefingColor = 0;
-            tabStop = 0;
-
-            rendering = true;
-
-            (playThread = new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-                NewPage(false);
-                MainLoop();
-                playThread = null;
-            })).Start();
         }
 
         public void Stop()
         {
-            playing = false;
-            text = null;
+            lock (playLock)
+            {
+                playing = false;
+                text = null;
+            }
         }
 
         private bool DrawBackground()
@@ -468,7 +511,7 @@ namespace BriefingStudio
             byte[] pcxTexture = findFile(pcx);
             if (pcxTexture == null)
             {
-                MessageBox.Show(null, pcx + " not found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowText(pcx + " not found");
                 playing = false;
                 return false;
             }
@@ -508,13 +551,13 @@ namespace BriefingStudio
                 sw.Start();
             }
 
-            while (playing && !keyPress)
+            while (playing && !keyPress && !interrupted)
             {
                 // try cursor flash
                 if (briefingFGcols != null && cursorFlash)
                 {
                     Color color;
-                    if (DateTimeOffset.Now.ToUnixTimeMilliseconds() % 500 >= 250)
+                    if (hurryUp || (DateTimeOffset.Now.ToUnixTimeMilliseconds() % 500 >= 250))
                     {
                         color = briefingFGcols[briefingColor];
                     }
@@ -527,7 +570,15 @@ namespace BriefingStudio
                     dummy = tx + 1;
                 }
 
-                Thread.Sleep(charDelay / 2);
+                try
+                {
+                    Thread.Sleep(hurryUp ? 1000 : charDelay / 2);
+                }
+                catch (ThreadInterruptedException)
+                {
+                    interrupted = true;
+                    return;
+                }
 
                 if (sw != null && sw.ElapsedMilliseconds >= (timeout * 1000))
                 {
@@ -551,6 +602,7 @@ namespace BriefingStudio
 
         private void NewPage(bool background)
         {
+            if (interrupted) return;
             if (background)
             {
                 if (!DrawBackground())
@@ -566,7 +618,7 @@ namespace BriefingStudio
                 UpdateBriefingColors();
             }
             MoveText(screens[screenNum].ulx, screens[screenNum].uly);
-            useDelay = true;
+            useDelay = !hurryUp;
             keyPress = false;
             robotMoviePlaying = null;
             robotSpinning = -1;
@@ -574,15 +626,17 @@ namespace BriefingStudio
             font.ResetKerning();
         }
 
-        public void EndOfBriefing()
+        public void ShowText(string text)
         {
+            if (interrupted)
+                return;
+
             lock (graphicsLock)
             {
                 NewPage(false);
 
                 graphics.Clear(Color.Black);
                 MoveText(0, 0);
-                string text = "END OF BRIEFING.";
 
                 foreach (char c in text)
                 {
@@ -590,6 +644,14 @@ namespace BriefingStudio
                 }
                 font.ResetKerning();
             }
+        }
+
+        public void EndOfBriefing()
+        {
+            if (interrupted)
+                return;
+
+            ShowText("END OF BRIEFING.");
             BriefingEnded?.Invoke(this, new EventArgs());
         }
 
@@ -605,6 +667,7 @@ namespace BriefingStudio
 
         private void SkipRestOfLine()
         {
+            if (text == null) return;
             int newIndex = text.IndexOf('\n', textIndex);
             textIndex = newIndex >= textIndex ? newIndex + 1 : text.Length;
         }
@@ -631,8 +694,11 @@ namespace BriefingStudio
                     // end of screen...
                     if (gotZ)
                         WaitKey(cursorFlash);
-                    EndOfBriefing();
-                    Stop();
+                    if (!interrupted)
+                    {
+                        EndOfBriefing();
+                        Stop();
+                    }
                     return;
                 }
 
@@ -657,7 +723,7 @@ namespace BriefingStudio
                         int newNumber = ReadMessageNumber();
                         if (newNumber >= screens.Count || screens[newNumber] == null)
                         {
-                            MessageBox.Show(null, "Screen index " + newNumber + " is undefined", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            ShowText("Invalid screen #" + newNumber);
                             playing = false;
                             return;
                         }
@@ -677,7 +743,7 @@ namespace BriefingStudio
                         int n = ReadMessageNumber() - 1;
                         if (n >= briefingFGcols.Length)
                         {
-                            MessageBox.Show(null, "Invalid color: " + n, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            ShowText("Invalid color #" + n);
                             playing = false;
                             return;
                         }
@@ -713,6 +779,7 @@ namespace BriefingStudio
                     {
                         // page change
                         WaitKey(cursorFlash);
+                        if (interrupted) return;
                         NewPage(true);
                         SkipRestOfLine();
                     }
@@ -756,10 +823,11 @@ namespace BriefingStudio
                             if (newNumber != screenNum)
                             {
                                 WaitKey(cursorFlash, 60);
+                                if (interrupted) return;
                             }
                             if (newNumber >= screens.Count || screens[newNumber] == null)
                             {
-                                MessageBox.Show(null, "Screen index " + newNumber + " is undefined", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                ShowText("Invalid screen #" + newNumber);
                                 playing = false;
                                 return;
                             }
@@ -862,6 +930,7 @@ namespace BriefingStudio
                     if (ty > scr.uly + scr.height)
                     {
                         WaitKey(cursorFlash);
+                        if (interrupted) return;
                         NewPage(true);
                     }
                 }

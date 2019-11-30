@@ -58,5 +58,29 @@ namespace BriefingStudio.Properties {
                 this["showBriefingBox"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string baseHogPath {
+            get {
+                return ((string)(this["baseHogPath"]));
+            }
+            set {
+                this["baseHogPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool autoPreview {
+            get {
+                return ((bool)(this["autoPreview"]));
+            }
+            set {
+                this["autoPreview"] = value;
+            }
+        }
     }
 }

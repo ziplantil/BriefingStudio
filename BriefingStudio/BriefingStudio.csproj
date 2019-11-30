@@ -45,10 +45,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Windows\BannerCreatorForm.cs">
+    <Compile Include="Logic\Formats\BriefingProject.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="UI\RichTextBoxEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\ToolStripNumericUpDown.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\InteractiveEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\BannerCreatorForm.Designer.cs">
+    <Compile Include="UI\InteractiveEditorForm.Designer.cs">
+      <DependentUpon>InteractiveEditorForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\BannerCreatorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\BannerCreatorForm.Designer.cs">
       <DependentUpon>BannerCreatorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Logic\Briefing.cs" />
@@ -63,72 +77,83 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Windows\HighResScreenForm.cs">
+    <Compile Include="UI\HighResScreenForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\HighResScreenForm.Designer.cs">
+    <Compile Include="UI\HighResScreenForm.Designer.cs">
       <DependentUpon>HighResScreenForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Windows\LowResScreenForm.cs">
+    <Compile Include="UI\LowResScreenForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\LowResScreenForm.Designer.cs">
+    <Compile Include="UI\LowResScreenForm.Designer.cs">
       <DependentUpon>LowResScreenForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Windows\MainForm.cs">
+    <Compile Include="UI\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\MainForm.Designer.cs">
+    <Compile Include="UI\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Logic\Formats\PCXDecoder.cs" />
     <Compile Include="Logic\Formats\PCXHeader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Windows\SettingsForm.cs">
+    <Compile Include="UI\SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\SettingsForm.Designer.cs">
+    <Compile Include="UI\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Logic\Formats\TXBConverter.cs" />
-    <Compile Include="Windows\TXBEditorForm.cs">
+    <Compile Include="UI\TXBEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\TXBEditorForm.Designer.cs">
+    <Compile Include="UI\TXBEditorForm.Designer.cs">
       <DependentUpon>TXBEditorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Windows\TXBSyntaxHelpForm.cs">
+    <Compile Include="UI\TXBSyntaxHelpForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Windows\TXBSyntaxHelpForm.Designer.cs">
+    <Compile Include="UI\TXBSyntaxHelpForm.Designer.cs">
       <DependentUpon>TXBSyntaxHelpForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Windows\BannerCreatorForm.resx">
+    <EmbeddedResource Include="UI\BannerCreatorForm.resx">
       <DependentUpon>BannerCreatorForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\HighResScreenForm.resx">
+    <EmbeddedResource Include="UI\HighResScreenForm.resx">
       <DependentUpon>HighResScreenForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\LowResScreenForm.resx">
+    <EmbeddedResource Include="UI\InteractiveEditorForm.resx">
+      <DependentUpon>InteractiveEditorForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\LowResScreenForm.resx">
       <DependentUpon>LowResScreenForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\MainForm.resx">
+    <EmbeddedResource Include="UI\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\SettingsForm.resx">
+    <EmbeddedResource Include="UI\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\TXBEditorForm.resx">
+    <EmbeddedResource Include="UI\TXBEditorForm.resx">
       <DependentUpon>TXBEditorForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Windows\TXBSyntaxHelpForm.resx">
+    <EmbeddedResource Include="UI\TXBSyntaxHelpForm.resx">
       <DependentUpon>TXBSyntaxHelpForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -148,6 +173,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\briefingHelpD2.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\toolStripButtonBlue.Image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\toolStripButtonGray.Image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\toolStripButtonGreen.Image.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

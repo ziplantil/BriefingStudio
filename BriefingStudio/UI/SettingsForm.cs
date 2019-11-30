@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace BriefingStudio
+namespace BriefingStudio.UI
 {
     public partial class SettingsForm : Form
     {

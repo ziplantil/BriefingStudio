@@ -1,4 +1,4 @@
-﻿namespace BriefingStudio
+﻿namespace BriefingStudio.Logic.Formats
 {
     internal class HOGResource
     {

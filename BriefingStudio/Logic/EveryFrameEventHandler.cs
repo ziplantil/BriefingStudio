@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Threading;
 
-namespace BriefingStudio
+namespace BriefingStudio.Logic
 {
     class EveryFrameEventHandler
     {
-        // Tom Miller's Render Loop
+        // based on Tom Miller's Render Loop
         public event EventHandler IdleFrame;
 
         internal void Bind()
@@ -19,6 +20,7 @@ namespace BriefingStudio
             while (AppStillIdle)
             {
                 IdleFrame?.Invoke(this, e);
+                Thread.Sleep(5);
             }
         }
 

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace BriefingStudio
+namespace BriefingStudio.UI
 {
     public partial class TXBSyntaxHelpForm : Form
     {

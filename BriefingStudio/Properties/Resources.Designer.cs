@@ -61,8 +61,29 @@ namespace BriefingStudio.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to D1
-        ///.
+        ///   Looks up a localized string similar to TXB BRIEFING HELP FOR DESCENT I
+        ///===============================
+        ///
+        ///Sequence
+        ///--------
+        ///
+        ///Sequence numbers are screen numbers, and are hardcoded.
+        ///For a complete table of screen numbers, consul
+        ///Appendix A.
+        ///
+        ///Notes
+        ///-----
+        ///Note that text colors are hardcoded, but will be matched
+        ///against the palette of the current PCX background,
+        ///allowing some variation. In order to preserve the
+        ///correct colors, they should be present in the PCX palette.
+        ///
+        ///Any lines starting with ; are ignored.
+        ///
+        ///Commands
+        ///--------
+        ///
+        ///S [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string briefingHelpD1 {
             get {
@@ -71,12 +92,60 @@ namespace BriefingStudio.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to D2
-        ///.
+        ///   Looks up a localized string similar to TXB BRIEFING HELP FOR DESCENT II
+        ///================================
+        ///
+        ///Sequence
+        ///--------
+        ///
+        ///Sequence numbers correspond to level numbers.
+        ///The corresponding sequence N is played as a briefing
+        ///before level N starts. Sequence 0 is not used.
+        ///
+        ///To play a briefing after all of the levels are complete,
+        ///use the sequence number N+1, where N is the number
+        ///of levels.
+        ///
+        ///Briefings cannot be added to secret levels.
+        ///
+        ///Notes
+        ///-----
+        ///Note that text colors are hardcoded, but will be matched
+        ///against the palette of the [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string briefingHelpD2 {
             get {
                 return ResourceManager.GetString("briefingHelpD2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap toolStripButtonBlue_Image {
+            get {
+                object obj = ResourceManager.GetObject("toolStripButtonBlue_Image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap toolStripButtonGray_Image {
+            get {
+                object obj = ResourceManager.GetObject("toolStripButtonGray_Image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap toolStripButtonGreen_Image {
+            get {
+                object obj = ResourceManager.GetObject("toolStripButtonGreen_Image", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

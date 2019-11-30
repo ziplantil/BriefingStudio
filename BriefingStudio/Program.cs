@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BriefingStudio.UI;
+using System;
 using System.Windows.Forms;
 
 namespace BriefingStudio

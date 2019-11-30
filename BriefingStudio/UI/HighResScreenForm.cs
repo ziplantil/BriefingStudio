@@ -1,11 +1,11 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 
-namespace BriefingStudio
+namespace BriefingStudio.UI
 {
-    public partial class LowResScreenForm : Form
+    public partial class HighResScreenForm : Form
     {
-        public LowResScreenForm()
+        public HighResScreenForm()
         {
             InitializeComponent();
         }
@@ -15,7 +15,7 @@ namespace BriefingStudio
             this.screen.Image = b;
         }
 
-        private void LowResScreenForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void HighResScreenForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (e.CloseReason == CloseReason.UserClosing)
             {

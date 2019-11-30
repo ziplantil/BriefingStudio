@@ -5,7 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.CompilerServices;
 
-namespace BriefingStudio
+namespace BriefingStudio.Logic.Formats
 {
     public class FNTFont
     {

@@ -1,9 +1,11 @@
-﻿using System;
+﻿using BriefingStudio.Logic;
+using BriefingStudio.Logic.Formats;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
 
-namespace BriefingStudio
+namespace BriefingStudio.UI
 {
     public partial class MainForm : Form
     {
@@ -14,6 +16,7 @@ namespace BriefingStudio
         private TXBEditorForm editor = new TXBEditorForm();
         private SettingsForm settingsForm = new SettingsForm();
         private BannerCreatorForm bannerCreatorForm = new BannerCreatorForm();
+        private InteractiveEditorForm betterEditor = null;
         private Briefing bl = null;
         private Briefing bh = null;
         private int descentGame;
@@ -79,16 +82,33 @@ namespace BriefingStudio
             StopBriefing();
         }
 
-        public void PlayBriefing(string text, int n)
+        public void SubmitBriefing(string contents)
         {
+            if (editor.Unsaved && !editor.fromCompile)
+            {
+                if (DialogResult.Yes != MessageBox.Show(this, "The TXB editor already has an unsaved TXB. Overwrite it?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning))
+                {
+                    return;
+                }
+            }
+            editor.ImportText(contents);
+        }
+
+        public void PlayBriefing(string text, int n, bool instant)
+        {
+            if (bl == null)
+            {
+                MessageBox.Show(this, "Open a base HOG first!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             PlayingBriefing = true;
             if (text != null)
             {
                 bl.Load(text);
                 bh.Load(text);
             }
-            bl.Play(n);
-            bh.Play(n);
+            bl.Play(n, instant);
+            bh.Play(n, instant);
         }
 
         private void PlayBriefing(int n)
@@ -113,7 +133,7 @@ namespace BriefingStudio
                 bh.Load(briefing);
                 loadedBriefing = newLoadedBriefing;
             }
-            PlayBriefing(briefing, n);
+            PlayBriefing(briefing, n, false);
         }
 
         private void PlayBriefing()
@@ -173,15 +193,17 @@ namespace BriefingStudio
             workingHogOpenFileDialog.ShowDialog();
         }
 
-        private void DescentHogOpenFileDialog_FileOk(object sender, CancelEventArgs e)
+        private void LoadBaseHog(string filename)
         {
             editor.SetDescentGame(0);
+            betterEditor?.SetDescentGame(0);
+
             baseHog?.Dispose();
             baseHogLabel.Text = "No Descent HOG file specified";
             baseHog = null;
             try
             {
-                baseHog = new HOGFile(descentHogOpenFileDialog.FileName);
+                baseHog = new HOGFile(filename);
             }
             catch (ArgumentException aex)
             {
@@ -246,9 +268,12 @@ namespace BriefingStudio
             lowres.Refresh();
             highres.Refresh();
             editor.SetDescentGame(descentGame);
+            betterEditor?.SetDescentGame(descentGame);
+            Properties.Settings.Default.baseHogPath = filename;
+            Properties.Settings.Default.Save();
         }
 
-        private void WorkingHogOpenFileDialog_FileOk(object sender, CancelEventArgs e)
+        private void LoadWorkingHog(string filename)
         {
             workingHog?.Dispose();
             editor.SetCanSave(false);
@@ -257,11 +282,11 @@ namespace BriefingStudio
             loadedBriefing = null;
             try
             {
-                workingHog = new HOGFile(workingHogOpenFileDialog.FileName);
-                workingHogLabel.Text = "Working HOG: " + Path.GetFileName(workingHogOpenFileDialog.FileName);
+                workingHog = new HOGFile(filename);
+                workingHogLabel.Text = "Working HOG: " + Path.GetFileName(filename);
                 if (briefingNameTextBox.Text.Length == 0)
                 {
-                    briefingNameTextBox.Text = Path.GetFileNameWithoutExtension(workingHogOpenFileDialog.FileName) + ".txb";
+                    briefingNameTextBox.Text = Path.GetFileNameWithoutExtension(filename) + ".txb";
                 }
                 editor.SetCanSave(true);
             }
@@ -271,6 +296,16 @@ namespace BriefingStudio
                 workingHog = null;
                 return;
             }
+        }
+
+        private void DescentHogOpenFileDialog_FileOk(object sender, CancelEventArgs e)
+        {
+            LoadBaseHog(descentHogOpenFileDialog.FileName);
+        }
+
+        private void WorkingHogOpenFileDialog_FileOk(object sender, CancelEventArgs e)
+        {
+            LoadWorkingHog(workingHogOpenFileDialog.FileName);
         }
 
         private byte[] FindFile(string fileName)
@@ -323,7 +358,19 @@ namespace BriefingStudio
         */
         private void MainForm_Load(object sender, EventArgs e)
         {
-
+            Properties.Settings.Default.Reload();
+            try
+            {
+                if (Properties.Settings.Default.baseHogPath.Length > 0)
+                {
+                    LoadBaseHog(Properties.Settings.Default.baseHogPath);
+                }
+            }
+            catch (Exception)
+            {
+                Properties.Settings.Default.baseHogPath = "";
+                Properties.Settings.Default.Save();
+            }
         }
 
         private void stopBriefingButton_Click(object sender, EventArgs e)
@@ -343,7 +390,7 @@ namespace BriefingStudio
 
         private void closeWorkingHogButton_Click(object sender, EventArgs e)
         {
-            workingHog.Dispose();
+            workingHog?.Dispose();
             workingHog = null;
             workingHogLabel.Text = "No Working HOG opened";
             editor.SetCanSave(false);
@@ -371,6 +418,22 @@ namespace BriefingStudio
             bannerCreatorForm.SetFindFile(FindFile);
             bannerCreatorForm.Show();
             bannerCreatorForm.BringToFront();
+        }
+
+        private void newEditorButton_Click(object sender, EventArgs e)
+        {
+            if ((Application.OpenForms["InteractiveEditorForm"] as InteractiveEditorForm) != null)
+            {
+                betterEditor?.BringToFront();
+            }
+            else
+            {
+                betterEditor?.Dispose();
+                betterEditor = new InteractiveEditorForm();
+                betterEditor.SetDelegates(FindFile, PlayBriefing, StopBriefing, SubmitBriefing);
+                betterEditor.SetDescentGame(descentGame);
+                betterEditor.Show();
+            }
         }
     }
 }
