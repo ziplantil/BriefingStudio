@@ -74,19 +74,24 @@ namespace BriefingStudio.Logic.Formats
         [Serializable()]
         public class BriefingScreen
         {
-            public string Text;
+            public string Text = "";
+            private Rectangle _region = new Rectangle(20, 22, 257, 177);
+            private int _tabStop = 0;
 
             [DescriptionAttribute("The file name of the background used for this screen. Must be a PCX file.")]
             public string Background { get; set; }
-            [DescriptionAttribute("The rectangle within which text will appear on the screen. All coordinates are relative to a 320x200 screen when scaled.")]
-            public Rectangle TextRegion { get; set; }
+            [DescriptionAttribute("The rectangle within which text will appear on the screen. All coordinates are relative to a 320x200 screen for scaling.")]
+            public Rectangle TextRegion { get { return _region; } set { _region = ClampRectangle(value); } }
             [DescriptionAttribute("Whether to show a cursor on this screen.")]
             public bool FlashCursor { get; set; }
+            [DescriptionAttribute("The pixel from the left of the text region at which tabs should stop, relative to a 320x200 screen for scaling.")]
+            public int TabStop { get { return _tabStop; } set { _tabStop = Clamp(value, 0, 319); } }
 
             public BriefingScreen()
             {
                 Text = "";
                 Background = "END01.PCX";
+                TabStop = 0;
                 TextRegion = new Rectangle(20, 22, 257, 177);
                 FlashCursor = true;
             }
@@ -95,8 +100,21 @@ namespace BriefingStudio.Logic.Formats
             {
                 Text = "";
                 Background = template.Background;
+                TabStop = template.TabStop;
                 TextRegion = template.TextRegion;
                 FlashCursor = template.FlashCursor;
+            }
+
+            private static int Clamp(int value, int min, int max)
+            {
+                return Math.Max(min, Math.Min(max, value));
+            }
+
+            private static Rectangle ClampRectangle(Rectangle orig)
+            {
+                int x = Clamp(orig.Left, 0, 319);
+                int y = Clamp(orig.Top, 0, 199);
+                return new Rectangle(x, y, Clamp(orig.Width, 1, 320 - x), Clamp(orig.Height, 1, 200 - y));
             }
 
             public string ToBriefing(int level, ref int message, ref bool cursor)
@@ -108,6 +126,7 @@ namespace BriefingStudio.Logic.Formats
                 {
                     header += "$F\n";
                 }
+                header += $"$T{TabStop}\n";
                 ++message;
                 cursor = FlashCursor;
                 return header + Text;
