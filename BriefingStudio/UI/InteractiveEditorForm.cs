@@ -833,6 +833,7 @@ namespace BriefingStudio.UI
                 BriefingProject.BriefingLevel level = new BriefingProject.BriefingLevel();
                 bool created = false;
                 bool cursorFlash = false;
+                int tabStop = 0;
 
                 Project.Intro = new BriefingProject.BriefingLevel();
                 foreach (string origPage in pages)
@@ -889,6 +890,15 @@ namespace BriefingStudio.UI
                             else
                                 page = page.Substring(newline + 1);
                         }
+                        else if (page.StartsWith("$T"))
+                        {
+                            newline = page.IndexOf("\n");
+                            screen.TabStop = GetLeadingInt(page.Substring(2, newline - 2).Trim());
+                            if (newline < 0)
+                                page = "";
+                            else
+                                page = page.Substring(newline + 1);
+                        }
                         else if (page.StartsWith("$F"))
                         {
                             cursorFlash = !cursorFlash;
@@ -904,6 +914,7 @@ namespace BriefingStudio.UI
                         }
                     }
 
+                    screen.TabStop = tabStop;
                     screen.Text = page;
 
                     level.Screens.Add(screen);

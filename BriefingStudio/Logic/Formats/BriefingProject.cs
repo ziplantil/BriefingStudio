@@ -114,7 +114,7 @@ namespace BriefingStudio.Logic.Formats
             {
                 int x = Clamp(orig.Left, 0, 319);
                 int y = Clamp(orig.Top, 0, 199);
-                return new Rectangle(x, y, Clamp(orig.Width, 1, 320 - x), Clamp(orig.Height, 1, 200 - y));
+                return new Rectangle(x, y, Clamp(orig.Width, 1, 400 - x), Clamp(orig.Height, 1, 280 - y));
             }
 
             public string ToBriefing(int level, ref int message, ref bool cursor)
