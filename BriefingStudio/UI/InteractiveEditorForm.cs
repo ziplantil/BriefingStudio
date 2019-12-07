@@ -34,6 +34,7 @@ namespace BriefingStudio.UI
         private BriefingProject _project;
         private BriefingProject.BriefingLevel _level;
         private BriefingProject.BriefingScreen _screen;
+        private BriefingProject.BriefingScreen copiedScreen;
 
         private static Color[] textColors = { Color.FromArgb(0, 252, 0), Color.FromArgb(204, 176, 144), Color.FromArgb(38, 146, 255) };
 
@@ -46,6 +47,7 @@ namespace BriefingStudio.UI
                 {
                     Level = null;
                     levelComboBox.SelectedIndex = -1;
+                    toolStripButtonPaste.Enabled = false;
                 }
                 _project = value;
                 saveasToolStripMenuItem.Enabled =
@@ -67,6 +69,10 @@ namespace BriefingStudio.UI
                 {
                     Screen = null;
                     screenListBox.ClearSelected();
+                }
+                if (value == null)
+                {
+                    toolStripButtonPaste.Enabled = false;
                 }
                 _level = value;
                 screenListBox.Enabled =
@@ -107,6 +113,8 @@ namespace BriefingStudio.UI
                     cutToolStripMenuItem.Enabled =
                     copyToolStripMenuItem.Enabled =
                     pasteToolStripMenuItem.Enabled =
+                    toolStripButtonCopy.Enabled =
+                    toolStripButtonClipCopy.Enabled =
                     editorToolStrip.Enabled = _screen != null;
                 UpdateSelectionButtonEnabled();
             }
@@ -394,6 +402,7 @@ namespace BriefingStudio.UI
             {
                 rtf.AppendText(desc.Substring(previousIndex, newIndex - previousIndex));
                 // find number in text, check if range, otherwise skip and then to new line
+                newIndex += 2;
                 while (newIndex < desc.Length && (desc[newIndex] == ' ' || desc[newIndex] == '0')) newIndex++;
                 if (newIndex >= desc.Length) break;
                 if (Char.IsDigit(desc[newIndex]) && !Char.IsDigit(desc[newIndex + 1]))
@@ -488,17 +497,23 @@ namespace BriefingStudio.UI
                 copyToolStripButton.Enabled = selected;
         }
 
-        private void AddNewScreen()
+        private void CopyScreen(int newIndex, bool copyText)
         {
-            int newIndex = screenListBox.Items.Count;
             if (Screen != null)
-                Level.Screens.Add(new BriefingProject.BriefingScreen(Screen));
+                Level.Screens.Insert(newIndex, new BriefingProject.BriefingScreen(Screen));
             else
-                Level.Screens.Add(new BriefingProject.BriefingScreen());
+                Level.Screens.Insert(newIndex, new BriefingProject.BriefingScreen());
+            if (copyText)
+                Level.Screens[newIndex].Text = Screen.Text;
             UpdateScreenList();
             screenListBox.SelectedIndex = newIndex;
             UpdateSelectedScreen();
             Unsaved = true;
+        }
+
+        private void AddNewScreen()
+        {
+            CopyScreen(screenListBox.Items.Count, false);
         }
 
         private void DeleteThisScreen()
@@ -965,6 +980,32 @@ namespace BriefingStudio.UI
         private void propertyGrid_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             MaybeUpdatePreview();
+        }
+
+        private void toolStripButtonCopy_Click(object sender, EventArgs e)
+        {
+            CopyScreen(screenListBox.SelectedIndex + 1, true);
+        }
+
+        private void toolStripButtonClipCopy_Click(object sender, EventArgs e)
+        {
+            if (Screen != null)
+            {
+                copiedScreen = BriefingProject.BriefingScreen.Copy(Screen);
+                toolStripButtonPaste.Enabled = true;
+            }
+        }
+
+        private void toolStripButtonPaste_Click(object sender, EventArgs e)
+        {
+            if (copiedScreen != null)
+            {
+                Level.Screens.Insert(screenListBox.SelectedIndex, BriefingProject.BriefingScreen.Copy(copiedScreen));
+                UpdateScreenList();
+                screenListBox.SelectedIndex = screenListBox.SelectedIndex;
+                UpdateSelectedScreen();
+                Unsaved = true;
+            }
         }
     }
 }

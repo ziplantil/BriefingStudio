@@ -76,6 +76,9 @@
             this.toolStripButtonRemoveScreen = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonMoveUp = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonMoveDown = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButtonCopy = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButtonClipCopy = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButtonPaste = new System.Windows.Forms.ToolStripButton();
             this.levelComboBox = new System.Windows.Forms.ComboBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.briefingToolStrip = new System.Windows.Forms.ToolStrip();
@@ -484,7 +487,10 @@
             this.toolStripButtonAddScreen,
             this.toolStripButtonRemoveScreen,
             this.toolStripButtonMoveUp,
-            this.toolStripButtonMoveDown});
+            this.toolStripButtonMoveDown,
+            this.toolStripButtonCopy,
+            this.toolStripButtonClipCopy,
+            this.toolStripButtonPaste});
             this.screensToolStrip.Location = new System.Drawing.Point(0, 286);
             this.screensToolStrip.Name = "screensToolStrip";
             this.screensToolStrip.Size = new System.Drawing.Size(136, 25);
@@ -497,8 +503,9 @@
             this.toolStripButtonAddScreen.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonAddScreen.Image")));
             this.toolStripButtonAddScreen.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonAddScreen.Name = "toolStripButtonAddScreen";
-            this.toolStripButtonAddScreen.Size = new System.Drawing.Size(33, 22);
-            this.toolStripButtonAddScreen.Text = "Add";
+            this.toolStripButtonAddScreen.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButtonAddScreen.Text = "+";
+            this.toolStripButtonAddScreen.ToolTipText = "Add new screen to the end";
             this.toolStripButtonAddScreen.Click += new System.EventHandler(this.toolStripButtonAddScreen_Click);
             // 
             // toolStripButtonRemoveScreen
@@ -507,8 +514,9 @@
             this.toolStripButtonRemoveScreen.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonRemoveScreen.Image")));
             this.toolStripButtonRemoveScreen.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonRemoveScreen.Name = "toolStripButtonRemoveScreen";
-            this.toolStripButtonRemoveScreen.Size = new System.Drawing.Size(28, 22);
-            this.toolStripButtonRemoveScreen.Text = "Del";
+            this.toolStripButtonRemoveScreen.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButtonRemoveScreen.Text = "X";
+            this.toolStripButtonRemoveScreen.ToolTipText = "Delete the selected screen";
             this.toolStripButtonRemoveScreen.Click += new System.EventHandler(this.toolStripButtonRemoveScreen_Click);
             // 
             // toolStripButtonMoveUp
@@ -517,8 +525,9 @@
             this.toolStripButtonMoveUp.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonMoveUp.Image")));
             this.toolStripButtonMoveUp.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonMoveUp.Name = "toolStripButtonMoveUp";
-            this.toolStripButtonMoveUp.Size = new System.Drawing.Size(26, 22);
-            this.toolStripButtonMoveUp.Text = "Up";
+            this.toolStripButtonMoveUp.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButtonMoveUp.Text = "^";
+            this.toolStripButtonMoveUp.ToolTipText = "Move the selected screen up";
             this.toolStripButtonMoveUp.Click += new System.EventHandler(this.toolStripButtonMoveUp_Click);
             // 
             // toolStripButtonMoveDown
@@ -527,9 +536,44 @@
             this.toolStripButtonMoveDown.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonMoveDown.Image")));
             this.toolStripButtonMoveDown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonMoveDown.Name = "toolStripButtonMoveDown";
-            this.toolStripButtonMoveDown.Size = new System.Drawing.Size(26, 22);
-            this.toolStripButtonMoveDown.Text = "Dn";
+            this.toolStripButtonMoveDown.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButtonMoveDown.Text = "v";
+            this.toolStripButtonMoveDown.ToolTipText = "Move the selected screen down";
             this.toolStripButtonMoveDown.Click += new System.EventHandler(this.toolStripButtonMoveDown_Click);
+            // 
+            // toolStripButtonCopy
+            // 
+            this.toolStripButtonCopy.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButtonCopy.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonCopy.Image")));
+            this.toolStripButtonCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButtonCopy.Name = "toolStripButtonCopy";
+            this.toolStripButtonCopy.Size = new System.Drawing.Size(23, 19);
+            this.toolStripButtonCopy.Text = "x2";
+            this.toolStripButtonCopy.ToolTipText = "Duplicate";
+            this.toolStripButtonCopy.Click += new System.EventHandler(this.toolStripButtonCopy_Click);
+            // 
+            // toolStripButtonClipCopy
+            // 
+            this.toolStripButtonClipCopy.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButtonClipCopy.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonClipCopy.Image")));
+            this.toolStripButtonClipCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButtonClipCopy.Name = "toolStripButtonClipCopy";
+            this.toolStripButtonClipCopy.Size = new System.Drawing.Size(23, 20);
+            this.toolStripButtonClipCopy.Text = "Copy";
+            this.toolStripButtonClipCopy.ToolTipText = "Copy the selected screen for pasting later";
+            this.toolStripButtonClipCopy.Click += new System.EventHandler(this.toolStripButtonClipCopy_Click);
+            // 
+            // toolStripButtonPaste
+            // 
+            this.toolStripButtonPaste.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButtonPaste.Enabled = false;
+            this.toolStripButtonPaste.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonPaste.Image")));
+            this.toolStripButtonPaste.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButtonPaste.Name = "toolStripButtonPaste";
+            this.toolStripButtonPaste.Size = new System.Drawing.Size(23, 20);
+            this.toolStripButtonPaste.Text = "Paste";
+            this.toolStripButtonPaste.ToolTipText = "Paste the screen that was copied before";
+            this.toolStripButtonPaste.Click += new System.EventHandler(this.toolStripButtonPaste_Click);
             // 
             // levelComboBox
             // 
@@ -753,5 +797,8 @@
         private System.Windows.Forms.SaveFileDialog exportTxbFileDialog;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemAutoPreview;
+        private System.Windows.Forms.ToolStripButton toolStripButtonCopy;
+        private System.Windows.Forms.ToolStripButton toolStripButtonClipCopy;
+        private System.Windows.Forms.ToolStripButton toolStripButtonPaste;
     }
 }

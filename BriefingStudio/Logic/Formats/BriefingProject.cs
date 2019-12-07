@@ -138,6 +138,13 @@ namespace BriefingStudio.Logic.Formats
                 bool flash = false;
                 return ToBriefing(1, ref message, ref flash);
             }
+
+            internal static BriefingScreen Copy(BriefingScreen copiedScreen)
+            {
+                BriefingScreen result = new BriefingScreen(copiedScreen);
+                result.Text = copiedScreen.Text;
+                return result;
+            }
         }
     }
 }
