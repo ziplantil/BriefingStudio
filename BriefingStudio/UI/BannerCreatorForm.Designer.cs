@@ -34,6 +34,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.fontTextBox = new System.Windows.Forms.TextBox();
             this.bannerSaveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.testFontButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textTextBox
@@ -86,11 +87,22 @@
             this.bannerSaveFileDialog.Title = "Save banner to";
             this.bannerSaveFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.bannerSaveFileDialog_FileOk);
             // 
+            // testFontButton
+            // 
+            this.testFontButton.Location = new System.Drawing.Point(308, 73);
+            this.testFontButton.Name = "testFontButton";
+            this.testFontButton.Size = new System.Drawing.Size(75, 23);
+            this.testFontButton.TabIndex = 5;
+            this.testFontButton.Text = "Test font";
+            this.testFontButton.UseVisualStyleBackColor = true;
+            this.testFontButton.Click += new System.EventHandler(this.testFontButton_Click);
+            // 
             // BannerCreatorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(395, 104);
+            this.Controls.Add(this.testFontButton);
             this.Controls.Add(this.fontTextBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.makeButton);
@@ -115,5 +127,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox fontTextBox;
         private System.Windows.Forms.SaveFileDialog bannerSaveFileDialog;
+        private System.Windows.Forms.Button testFontButton;
     }
 }

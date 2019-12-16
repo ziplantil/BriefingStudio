@@ -17,6 +17,7 @@ namespace BriefingStudio.UI
         public delegate byte[] FindFile(string filename);
 
         private FindFile findFile;
+        private bool testing;
 
         public BannerCreatorForm()
         {
@@ -32,6 +33,7 @@ namespace BriefingStudio.UI
         {
             if (textTextBox.Text.Length > 0 && fontTextBox.Text.Length > 0)
             {
+                testing = false;
                 bannerSaveFileDialog.ShowDialog();
             }
         }
@@ -46,12 +48,37 @@ namespace BriefingStudio.UI
             }
             string text = textTextBox.Text;
             FNTFont font = new FNTFont(new MemoryStream(fntData));
-            Bitmap result = new Bitmap(font.MeasureWidth(text), font.GetCharHeight());
+            Bitmap result;
 
-            int x = 0;
-            foreach (char c in text)
+            if (testing)
             {
-                font.DrawCharacterRaw(result, c, Color.Green, ref x, 0);
+                int cw = Math.Max(8, font.GetCharWidth('\0')) * 2;
+                result = new Bitmap(cw * 16, (font.GetCharHeight() + 3) * 16);
+                Graphics gdi = Graphics.FromImage(result);
+                int x = 0, lx, ly, lw;
+                Pen pen = new Pen(Color.Red);
+                for (int c = 0; c < 256; ++c)
+                {
+                    lx = (c % 16) * cw;
+                    ly = (font.GetCharHeight() + 3) * (c / 16);
+                    x = lx;
+                    font.ResetKerning();
+                    font.DrawCharacterRaw(result, (char)c, Color.Green, ref x, ly);
+
+                    x = lx;
+                    ly += font.GetCharHeight();
+                    lw = font.GetCharWidth((char)c);
+                    gdi.DrawLine(pen, lx, ly, lx + lw, ly);
+                }
+            }
+            else
+            {
+                result = new Bitmap(font.MeasureWidth(text), font.GetCharHeight());
+                int x = 0;
+                foreach (char c in text)
+                {
+                    font.DrawCharacterRaw(result, c, Color.Green, ref x, 0);
+                }
             }
             result.Save(bannerSaveFileDialog.FileName);
         }
@@ -63,6 +90,12 @@ namespace BriefingStudio.UI
                 e.Cancel = true;
                 this.Hide();
             }
+        }
+
+        private void testFontButton_Click(object sender, EventArgs e)
+        {
+            testing = true;
+            bannerSaveFileDialog.ShowDialog();
         }
     }
 }

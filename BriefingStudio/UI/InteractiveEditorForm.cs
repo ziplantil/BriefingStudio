@@ -223,7 +223,7 @@ namespace BriefingStudio.UI
             int index = levelComboBox.SelectedIndex;
             if (index >= 0)
             {
-                int outroIndex = (int)levelToolStripNumericUpDown.NumericUpDownControl.Value + 1;
+                int outroIndex = (int)levelToolStripNumericUpDown.NumericUpDownControl.Value;
                 /* if (index == 0)
                 {
                     Level = Project.Intro;
@@ -314,6 +314,12 @@ namespace BriefingStudio.UI
                     Project = (BriefingProject)bfmt.Deserialize(fs);
                 }
                 levelToolStripNumericUpDown.NumericUpDownControl.Value = Project.LevelCount;
+                if (Project.Outro.Screens.Count < 1 && Project.Levels.Count == Project.LevelCount + 1)
+                {
+                    int tmp = Project.LevelCount;
+                    Project.Outro = Project.Levels[tmp];
+                    Project.Levels.RemoveAt(tmp);
+                }
                 levelComboBox.SelectedIndex = 0;
                 UpdateSelectedLevel();
                 Unsaved = false;
