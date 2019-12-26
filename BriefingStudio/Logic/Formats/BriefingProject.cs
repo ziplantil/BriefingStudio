@@ -58,13 +58,15 @@ namespace BriefingStudio.Logic.Formats
                 bool first = true;
                 string res = "";
                 int message = 1;
+                BriefingScreen previousScreen = null;
                 foreach (BriefingScreen screen in Screens)
                 {
                     if (first)
                         first = false;
                     else
                         res += "$P\n";
-                    res += screen.ToBriefing(index, ref message, ref cursor);
+                    res += screen.ToBriefing(index, previousScreen == null || screen.HasNewAttributes(previousScreen), ref message, ref cursor);
+                    previousScreen = screen;
                 }
 
                 return "$S" + index + "\n" + res;
@@ -117,11 +119,19 @@ namespace BriefingStudio.Logic.Formats
                 return new Rectangle(x, y, Clamp(orig.Width, 1, 400 - x), Clamp(orig.Height, 1, 280 - y));
             }
 
-            public string ToBriefing(int level, ref int message, ref bool cursor)
+            public bool HasNewAttributes(BriefingScreen previous)
+            {
+                return this.TextRegion != previous.TextRegion || this.Background != previous.Background;
+            }
+
+            public string ToBriefing(int level, bool newAttributes, ref int message, ref bool cursor)
             {
                 string header = "";
-                header += $"$D1 {Background} {level} {message} {TextRegion.Left} {TextRegion.Top} {TextRegion.Width} {TextRegion.Height}\n";
-                header += $"$Z{Background}\n";
+                if (newAttributes)
+                {
+                    header += $"$D1 {Background} {level} {message} {TextRegion.Left} {TextRegion.Top} {TextRegion.Width} {TextRegion.Height}\n";
+                    header += $"$A$Z{Background}\n";
+                }
                 if (cursor != FlashCursor)
                 {
                     header += "$F\n";
@@ -136,7 +146,7 @@ namespace BriefingStudio.Logic.Formats
             {
                 int message = 1;
                 bool flash = false;
-                return ToBriefing(1, ref message, ref flash);
+                return ToBriefing(1, true, ref message, ref flash);
             }
 
             internal static BriefingScreen Copy(BriefingScreen copiedScreen)

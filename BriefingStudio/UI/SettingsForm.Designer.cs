@@ -32,6 +32,7 @@
             this.addEndSectionCheckBox = new System.Windows.Forms.CheckBox();
             this.resetButton = new System.Windows.Forms.Button();
             this.showBriefingBoxCheckBox = new System.Windows.Forms.CheckBox();
+            this.fadeTransitionsCheckBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // allowD2XColorsCheckBox
@@ -78,11 +79,23 @@
             this.showBriefingBoxCheckBox.UseVisualStyleBackColor = true;
             this.showBriefingBoxCheckBox.CheckedChanged += new System.EventHandler(this.showBriefingBoxCheckBox_CheckedChanged);
             // 
+            // fadeTransitionsCheckBox
+            // 
+            this.fadeTransitionsCheckBox.AutoSize = true;
+            this.fadeTransitionsCheckBox.Location = new System.Drawing.Point(3, 81);
+            this.fadeTransitionsCheckBox.Name = "fadeTransitionsCheckBox";
+            this.fadeTransitionsCheckBox.Size = new System.Drawing.Size(127, 17);
+            this.fadeTransitionsCheckBox.TabIndex = 4;
+            this.fadeTransitionsCheckBox.Text = "Show fade transitions";
+            this.fadeTransitionsCheckBox.UseVisualStyleBackColor = true;
+            this.fadeTransitionsCheckBox.CheckedChanged += new System.EventHandler(this.fadeTransitionsCheckBox_CheckedChanged);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(299, 319);
+            this.Controls.Add(this.fadeTransitionsCheckBox);
             this.Controls.Add(this.showBriefingBoxCheckBox);
             this.Controls.Add(this.resetButton);
             this.Controls.Add(this.addEndSectionCheckBox);
@@ -105,5 +118,6 @@
         private System.Windows.Forms.CheckBox addEndSectionCheckBox;
         private System.Windows.Forms.Button resetButton;
         private System.Windows.Forms.CheckBox showBriefingBoxCheckBox;
+        private System.Windows.Forms.CheckBox fadeTransitionsCheckBox;
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -43,6 +44,9 @@ namespace BriefingStudio.Logic
         private int ty;
         private int tabStop = 0;
         private int textIndex = 0;
+        private int lineAdjust = 0;
+        private int dumbAdjust = 0;
+        private int brightness = 255; // [0, 255]
         private string robotMoviePlaying;
         private int robotSpinning;
         private string bitmapDisplay;
@@ -466,6 +470,7 @@ namespace BriefingStudio.Logic
 
                 briefingColor = 0;
                 tabStop = 0;
+                brightness = 255;
 
                 rendering = true;
 
@@ -643,6 +648,7 @@ namespace BriefingStudio.Logic
                     font.DrawCharacter(screen, c, Color.White, Color.Black, ref tx, ty, false);
                 }
                 font.ResetKerning();
+                brightness = 255;
             }
         }
 
@@ -679,6 +685,36 @@ namespace BriefingStudio.Logic
             return n;
         }
 
+        private void FadeOut()
+        {
+            if (hurryUp || !Properties.Settings.Default.fadeTransitions) return;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            while (brightness > 0)
+            {
+                Thread.Sleep(15);
+                brightness -= (int)(sw.ElapsedMilliseconds / 2);
+                sw.Restart();
+            }
+            sw.Stop();
+            brightness = 0;
+        }
+
+        private void FadeIn()
+        {
+            if (hurryUp || !Properties.Settings.Default.fadeTransitions) return;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            while (brightness < 255)
+            {
+                Thread.Sleep(15);
+                brightness += (int)(sw.ElapsedMilliseconds / 2);
+                sw.Restart();
+            }
+            sw.Stop();
+            brightness = 255;
+        }
+
         private void MainLoop()
         {
             int pc = -1;
@@ -694,6 +730,7 @@ namespace BriefingStudio.Logic
                     // end of screen...
                     if (gotZ)
                         WaitKey(cursorFlash);
+                    FadeOut();
                     if (!interrupted)
                     {
                         EndOfBriefing();
@@ -716,6 +753,7 @@ namespace BriefingStudio.Logic
                     {
                         int newNumber = DefineBriefingBox();
                         screenNum = newNumber;
+                        lineAdjust = 0;
                         MoveText(screens[screenNum].ulx, screens[screenNum].uly);
                     }
                     else if (descentGame == 2 && c == 'U')
@@ -761,12 +799,20 @@ namespace BriefingStudio.Logic
                         tabStop = n;
                         SkipRestOfLine();
                     }
+                    else if (c == 'A')
+                    {
+                        lineAdjust = 1 - lineAdjust;
+                    }
                     else if (descentGame == 2 && c == 'Z')
                     {
                         gotZ = true;
+                        dumbAdjust = lineAdjust > 0 ? 1 : 2;
                         textIndex = ReadRestOfLine(text, textIndex, out string res);
+                        --dumbAdjust;
                         backgroundName = res;
+                        FadeOut();
                         DrawBackground();
+                        FadeIn();
                         UpdateBriefingColors();
                     }
                     else if (descentGame == 2 && c == 'A')
@@ -832,7 +878,9 @@ namespace BriefingStudio.Logic
                                 return;
                             }
                             screenNum = newNumber;
+                            FadeOut();
                             NewPage(true);
+                            FadeIn();
                             SkipRestOfLine();
                         }
                         else if (descentGame == 2)
@@ -866,7 +914,10 @@ namespace BriefingStudio.Logic
                     {
                         // newline
                         tx = scr.ulx;
-                        ty += highRes ? 16 : 8;
+                        if (dumbAdjust > 0)
+                            --dumbAdjust;
+                        else
+                            ty += highRes ? 16 : 8;
 
                         if (ty > scr.uly + scr.height)
                         {
@@ -881,7 +932,9 @@ namespace BriefingStudio.Logic
                     if (!gotZ)
                     {
                         backgroundName = "END01.PCX";
+                        FadeOut();
                         DrawBackground();
+                        FadeIn();
                         UpdateBriefingColors();
                         gotZ = true;
                     }
@@ -1012,6 +1065,31 @@ namespace BriefingStudio.Logic
             return rendering;
         }
 
+        public void ApplyBrightnessToFlipped()
+        {
+            BitmapData data = flipped.LockBits(frame, System.Drawing.Imaging.ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+
+            int cptr = 0;
+            IntPtr ptr = data.Scan0;
+            int bytes = data.Stride * data.Height;
+            byte[] rgbValues = new byte[bytes];
+            System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
+
+            for (int y = 0; y < frame.Height; ++y)
+            {
+                int p = y * data.Stride;
+                for (int x = 0; x < frame.Width; ++x)
+                {
+                    rgbValues[p + x * 4 + 1] = (byte)Math.Max(0, rgbValues[p + x * 4 + 1] * brightness / 255);
+                    rgbValues[p + x * 4 + 2] = (byte)Math.Max(0, rgbValues[p + x * 4 + 2] * brightness / 255);
+                    rgbValues[p + x * 4 + 0] = (byte)Math.Max(0, rgbValues[p + x * 4 + 0] * brightness / 255);
+                }
+            }
+
+            System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
+            flipped.UnlockBits(data);
+        }
+
         public Bitmap Render()
         {
             if (Monitor.TryEnter(graphicsLock, new TimeSpan(0, 0, 1)))
@@ -1019,6 +1097,10 @@ namespace BriefingStudio.Logic
                 try
                 {
                     flipper.DrawImageUnscaled(screen, 0, 0);
+                    if (brightness < 255)
+                    {
+                        ApplyBrightnessToFlipped();
+                    }
                     return flipped;
                 }
                 finally

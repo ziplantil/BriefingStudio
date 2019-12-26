@@ -120,7 +120,6 @@ namespace BriefingStudio.Logic.Formats
                             bw.Write(Utils.ASCIIToBytesPad(res.Name, 13));
                             if (res.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))
                             {
-                                System.Diagnostics.Debug.WriteLine("Y:" + res.Name + "<=>" + name);
                                 // ok, replace existing
                                 bw.Write(Utils.Int32LittleEndianToBytes(data.Length));
                                 bw.Write(data);
@@ -128,7 +127,6 @@ namespace BriefingStudio.Logic.Formats
                             }
                             else
                             {
-                                System.Diagnostics.Debug.WriteLine("N:" + res.Name + "<=>" + name);
                                 bw.Write(Utils.Int32LittleEndianToBytes(res.Length));
                                 myFs.Seek(res.Offset, SeekOrigin.Begin);
                                 Utils.StreamCopy(gs, myFs, res.Length);
