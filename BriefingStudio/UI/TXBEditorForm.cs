@@ -62,7 +62,7 @@ namespace BriefingStudio.UI
         {
             briefingNameTextBox.Text = fn;
             byte[] txb = findFile(fn);
-            string text = txb != null ? TXBConverter.DecodeTXB(txb) : "";
+            string text = txb != null ? LibDescent.Data.TXBConverter.DecodeTXB(txb) : "";
             txbBox.Text = text.Replace("\n", "\r\n");
         }
 

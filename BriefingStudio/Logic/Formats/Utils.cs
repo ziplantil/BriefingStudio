@@ -43,5 +43,31 @@ namespace BriefingStudio.Logic.Formats
                 n -= read;
             }
         }
+
+        internal static LibDescent.Data.Color GDIColorToLDColor(System.Drawing.Color color)
+        {
+            return new LibDescent.Data.Color(color.A, color.R, color.G, color.B);
+        }
+
+        internal static LibDescent.Data.Color[] GDIPaletteToLDPalette(System.Drawing.Color[] palette)
+        {
+            LibDescent.Data.Color[] array = new LibDescent.Data.Color[palette.Length];
+            for (int i = 0; i < array.Length; ++i)
+                array[i] = GDIColorToLDColor(palette[i]);
+            return array;
+        }
+
+        internal static System.Drawing.Color LDColorToGDIColor(LibDescent.Data.Color color)
+        {
+            return System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
+        }
+
+        internal static System.Drawing.Color[] LDPaletteToGDIPalette(LibDescent.Data.Color[] palette)
+        {
+            System.Drawing.Color[] array = new System.Drawing.Color[palette.Length];
+            for (int i = 0; i < array.Length; ++i)
+                array[i] = LDColorToGDIColor(palette[i]);
+            return array;
+        }
     }
 }

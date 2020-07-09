@@ -1,5 +1,6 @@
 ﻿using BriefingStudio.Logic;
 using BriefingStudio.Logic.Formats;
+using LibDescent.Data;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -11,6 +12,8 @@ namespace BriefingStudio.UI
     {
         private HOGFile baseHog;
         private HOGFile workingHog;
+        private string baseHogFile;
+        private string workingHogFile;
         private LowResScreenForm lowres = new LowResScreenForm();
         private HighResScreenForm highres = new HighResScreenForm();
         private TXBEditorForm editor = new TXBEditorForm();
@@ -69,7 +72,7 @@ namespace BriefingStudio.UI
             UpdateFrames();
         }
 
-        public void InitScreens(FNTFont fl, FNTFont fh)
+        public void InitScreens(FNTRenderer fl, FNTRenderer fh)
         {
             bl = new Briefing(false, descentGame, fl, FindFile);
             bh = new Briefing(true, descentGame, fh, FindFile);
@@ -180,7 +183,8 @@ namespace BriefingStudio.UI
             }
             editor.ModifyText(text.Replace("\n", "\r\n"));
             byte[] txb = TXBConverter.EncodeTXB(text);
-            workingHog.PutFile(filename, txb);
+            workingHog.ReplaceLump(new HOGLump(filename, txb));
+            workingHog.Write(workingHogFile);
         }
 
         private void DescentHogOpenButton_click(object sender, EventArgs e)
@@ -198,12 +202,11 @@ namespace BriefingStudio.UI
             editor.SetDescentGame(0);
             betterEditor?.SetDescentGame(0);
 
-            baseHog?.Dispose();
             baseHogLabel.Text = "No Descent HOG file specified";
             baseHog = null;
             try
             {
-                baseHog = new HOGFile(filename);
+                baseHog = new HOGFile(baseHogFile = filename);
             }
             catch (ArgumentException aex)
             {
@@ -212,19 +215,19 @@ namespace BriefingStudio.UI
             }
 
             baseHogLabel.Text = "No Descent HOG file specified";
-            if (!baseHog.HasFile("descent.txb") || !baseHog.HasFile("end01.pcx"))
+            if (!baseHog.ContainsFile("descent.txb") || !baseHog.ContainsFile("end01.pcx"))
             {
                 MessageBox.Show(this, "This is not a valid registered Descent 1 or Descent 2 main HOG", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 baseHog = null;
                 return;
             }
 
-            if (baseHog.HasFile("neptun01.pcx"))
+            if (baseHog.ContainsFile("neptun01.pcx"))
             {
                 descentGame = 1;
                 baseHogLabel.Text = "Main HOG: Descent 1";
             }
-            else if (baseHog.HasFile("d2levf-s.rl2"))
+            else if (baseHog.ContainsFile("d2levf-s.rl2"))
             {
                 descentGame = 2;
                 baseHogLabel.Text = "Main HOG: Descent 2";
@@ -236,7 +239,7 @@ namespace BriefingStudio.UI
                 return;
             }
 
-            byte[] font3_1 = baseHog.GetFile("FONT3-1.FNT");
+            byte[] font3_1 = baseHog.GetFileData("FONT3-1.FNT");
             if (font3_1 == null)
             {
                 MessageBox.Show(this, "FONT3-1.FNT not found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -244,24 +247,24 @@ namespace BriefingStudio.UI
                 return;
             }
 
-            FNTFont gamefontL, gamefontH = null;
+            FNTRenderer gamefontL, gamefontH = null;
 
-            gamefontL = new FNTFont(new MemoryStream(font3_1));
+            gamefontL = new FNTRenderer(LoadFont(new MemoryStream(font3_1)));
 
             if (descentGame == 1)
             {
-                gamefontH = new FNTFontUpScale(gamefontL);
+                gamefontH = new FNTRendererUpScale(gamefontL.font);
             }
             else if (descentGame == 2)
             {
-                font3_1 = baseHog.GetFile("FONT3-1H.FNT");
+                font3_1 = baseHog.GetFileData("FONT3-1H.FNT");
                 if (font3_1 == null)
                 {
                     MessageBox.Show(this, "FONT3-1H.FNT not found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     baseHog = null;
                     return;
                 }
-                gamefontH = new FNTFont(new MemoryStream(font3_1));
+                gamefontH = new FNTRenderer(LoadFont(new MemoryStream(font3_1)));
             }
 
             InitScreens(gamefontL, gamefontH);
@@ -273,16 +276,22 @@ namespace BriefingStudio.UI
             Properties.Settings.Default.Save();
         }
 
+        internal static Font LoadFont(Stream stream)
+        {
+            Font font = new Font();
+            font.LoadFont(stream);
+            return font;
+        }
+
         private void LoadWorkingHog(string filename)
         {
-            workingHog?.Dispose();
             editor.SetCanSave(false);
             workingHogLabel.Text = "No Working HOG opened";
             workingHog = null;
             loadedBriefing = null;
             try
             {
-                workingHog = new HOGFile(filename);
+                workingHog = new HOGFile(workingHogFile = filename);
                 workingHogLabel.Text = "Working HOG: " + Path.GetFileName(filename);
                 if (briefingNameTextBox.Text.Length == 0)
                 {
@@ -318,13 +327,13 @@ namespace BriefingStudio.UI
             byte[] file = null;
             if (workingHog != null)
             {
-                file = workingHog.GetFile(fileName);
+                file = workingHog.GetFileData(fileName);
                 if (file != null)
                 {
                     return file;
                 }
             }
-            return baseHog.GetFile(fileName);
+            return baseHog.GetFileData(fileName);
         }
 
         private void lowResScreenButton_Click(object sender, EventArgs e)
@@ -390,7 +399,6 @@ namespace BriefingStudio.UI
 
         private void closeWorkingHogButton_Click(object sender, EventArgs e)
         {
-            workingHog?.Dispose();
             workingHog = null;
             workingHogLabel.Text = "No Working HOG opened";
             editor.SetCanSave(false);

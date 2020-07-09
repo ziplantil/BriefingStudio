@@ -47,37 +47,38 @@ namespace BriefingStudio.UI
                 return;
             }
             string text = textTextBox.Text;
-            FNTFont font = new FNTFont(new MemoryStream(fntData));
+            LibDescent.Data.Font font = MainForm.LoadFont(new MemoryStream(fntData));
+            FNTRenderer frend = new FNTRenderer(font);
             Bitmap result;
 
             if (testing)
             {
                 int cw = Math.Max(8, font.GetCharWidth('\0')) * 2;
-                result = new Bitmap(cw * 16, (font.GetCharHeight() + 3) * 16);
+                result = new Bitmap(cw * 16, (font.Height + 3) * 16);
                 Graphics gdi = Graphics.FromImage(result);
                 int x = 0, lx, ly, lw;
                 Pen pen = new Pen(Color.Red);
                 for (int c = 0; c < 256; ++c)
                 {
                     lx = (c % 16) * cw;
-                    ly = (font.GetCharHeight() + 3) * (c / 16);
+                    ly = (font.Height + 3) * (c / 16);
                     x = lx;
-                    font.ResetKerning();
-                    font.DrawCharacterRaw(result, (char)c, Color.Green, ref x, ly);
+                    frend.Reset();
+                    frend.DrawCharacterRaw(result, (char)c, Color.Green, ref x, ly);
 
                     x = lx;
-                    ly += font.GetCharHeight();
+                    ly += font.Height;
                     lw = font.GetCharWidth((char)c);
                     gdi.DrawLine(pen, lx, ly, lx + lw, ly);
                 }
             }
             else
             {
-                result = new Bitmap(font.MeasureWidth(text), font.GetCharHeight());
+                result = new Bitmap(font.MeasureWidth(text), font.Height);
                 int x = 0;
                 foreach (char c in text)
                 {
-                    font.DrawCharacterRaw(result, c, Color.Green, ref x, 0);
+                    frend.DrawCharacterRaw(result, c, Color.Green, ref x, 0);
                 }
             }
             result.Save(bannerSaveFileDialog.FileName);

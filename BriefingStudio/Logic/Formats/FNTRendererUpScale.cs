@@ -5,25 +5,24 @@ using System.Drawing.Imaging;
 
 namespace BriefingStudio.Logic.Formats
 {
-    public class FNTFontUpScale : FNTFont
+    public class FNTRendererUpScale : FNTRenderer
     {
         Bitmap frame = null;
         Graphics frameGraphics;
         Rectangle frameRect;
 
-        public FNTFontUpScale(FNTFont font) : base(font)
+        public FNTRendererUpScale(LibDescent.Data.Font font) : base(font)
         {
         }
 
-
         public override void DrawCharacterRaw(Bitmap b, char c, Color clr, ref int x, int y)
         {
-            if (IsCharInFont(c))
+            if (this.font.IsCharInFont(c))
             {
                 // call DrawCharacterRaw and upscale
                 if (frame == null)
                 {
-                    frame = new Bitmap(this.cwidth * 4, this.cheight, PixelFormat.Format32bppArgb);
+                    frame = new Bitmap(this.font.Width * 4, this.font.Height, PixelFormat.Format32bppArgb);
                     frameGraphics = Graphics.FromImage(frame);
                     frameRect = new Rectangle(new Point(0, 0), frame.Size);
                 }

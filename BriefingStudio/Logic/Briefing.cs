@@ -23,7 +23,7 @@ namespace BriefingStudio.Logic
         private readonly Object graphicsLock = new Object();
         private int charDelay;
         private bool useDelay;
-        private FNTFont font;
+        private FNTRenderer font;
         private Color[] palette;
         private int briefingColor;
         private Color clearColor;
@@ -63,7 +63,7 @@ namespace BriefingStudio.Logic
         public delegate byte[] FindFile(string filename);
         private FindFile findFile;
 
-        public Briefing(bool highRes, int descentGame, FNTFont font, FindFile findFile)
+        public Briefing(bool highRes, int descentGame, FNTRenderer font, FindFile findFile)
         {
             this.findFile = findFile;
             this.descentGame = descentGame;
@@ -99,55 +99,60 @@ namespace BriefingStudio.Logic
                 return;
             }
 
-            clearColor = pcxdec.ClosestColor(palette, Color.Black);
+            clearColor = ClosestColor(palette, Color.Black);
             int i = 0;
             bool dxx = Properties.Settings.Default.allowD2XColors;
             if (descentGame == 1)
             {
-                briefingBGcols = new Color[dxx ? 7 : 2];
-                briefingFGcols = new Color[dxx ? 7 : 2];
-                briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 0, 76, 0));
-                briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 0, 216, 0));
-                briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 56, 56, 56));
-                briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 168, 152, 128));
+                briefingBGcols = new System.Drawing.Color[dxx ? 7 : 2];
+                briefingFGcols = new System.Drawing.Color[dxx ? 7 : 2];
+                briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 0, 76, 0));
+                briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 0, 216, 0));
+                briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 56, 56, 56));
+                briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 168, 152, 128));
 
                 if (dxx)
                 {
-                    briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 84, 0, 0));
-                    briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 252, 0, 0));
-                    briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 0, 0, 72));
-                    briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 0, 0, 216));
-                    briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 19, 19, 19));
-                    briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 56, 56, 56));
-                    briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 72, 72, 0));
-                    briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 216, 216, 0));
-                    briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 0, 72, 72));
-                    briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 0, 216, 216));
+                    briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 84, 0, 0));
+                    briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 252, 0, 0));
+                    briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 0, 0, 72));
+                    briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 0, 0, 216));
+                    briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 19, 19, 19));
+                    briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 56, 56, 56));
+                    briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 72, 72, 0));
+                    briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 216, 216, 0));
+                    briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 0, 72, 72));
+                    briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 0, 216, 216));
                 }
             }
             else if (descentGame == 2)
             {
-                briefingBGcols = new Color[dxx ? 7 : 3];
-                briefingFGcols = new Color[dxx ? 7 : 3];
-                briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 0, 24, 0));
-                briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 0, 160, 0));
-                briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 20, 20, 20));
-                briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 160, 132, 140));
-                briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 4, 16, 28));
-                briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 32, 124, 216));
+                briefingBGcols = new System.Drawing.Color[dxx ? 7 : 3];
+                briefingFGcols = new System.Drawing.Color[dxx ? 7 : 3];
+                briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 0, 24, 0));
+                briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 0, 160, 0));
+                briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 20, 20, 20));
+                briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 160, 132, 140));
+                briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 4, 16, 28));
+                briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 32, 124, 216));
 
                 if (dxx)
                 {
-                    briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 0, 0, 72));
-                    briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 0, 0, 216));
-                    briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 19, 19, 19));
-                    briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 56, 56, 56));
-                    briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 72, 72, 0));
-                    briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 216, 216, 0));
-                    briefingBGcols[i] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 0, 72, 72));
-                    briefingFGcols[i++] = pcxdec.ClosestColor(palette, Color.FromArgb(255, 0, 216, 216));
+                    briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 0, 0, 72));
+                    briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 0, 0, 216));
+                    briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 19, 19, 19));
+                    briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 56, 56, 56));
+                    briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 72, 72, 0));
+                    briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 216, 216, 0));
+                    briefingBGcols[i] = ClosestColor(palette, Color.FromArgb(255, 0, 72, 72));
+                    briefingFGcols[i++] = ClosestColor(palette, Color.FromArgb(255, 0, 216, 216));
                 }
             }
+        }
+
+        private Color ClosestColor(Color[] palette, Color color)
+        {
+            return Utils.LDColorToGDIColor(LibDescent.Data.PCXImage.ClosestColor(Utils.GDIPaletteToLDPalette(palette), Utils.GDIColorToLDColor(color)));
         }
 
         private string RemoveComments(string text)
@@ -389,7 +394,7 @@ namespace BriefingStudio.Logic
 
         private void MoveText(int x, int y)
         {
-            font.ResetKerning();
+            font.Reset();
             tx = x;
             ty = y;
         }
@@ -628,7 +633,7 @@ namespace BriefingStudio.Logic
             robotMoviePlaying = null;
             robotSpinning = -1;
             bitmapDisplay = null;
-            font.ResetKerning();
+            font.Reset();
         }
 
         public void ShowText(string text)
@@ -647,7 +652,7 @@ namespace BriefingStudio.Logic
                 {
                     font.DrawCharacter(screen, c, Color.White, Color.Black, ref tx, ty, false);
                 }
-                font.ResetKerning();
+                font.Reset();
                 brightness = 255;
             }
         }
@@ -1069,7 +1074,6 @@ namespace BriefingStudio.Logic
         {
             BitmapData data = flipped.LockBits(frame, System.Drawing.Imaging.ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
 
-            int cptr = 0;
             IntPtr ptr = data.Scan0;
             int bytes = data.Stride * data.Height;
             byte[] rgbValues = new byte[bytes];

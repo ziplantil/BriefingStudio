@@ -801,7 +801,7 @@ namespace BriefingStudio.UI
             {
                 using (FileStream fs = File.Open(exportTxbFileDialog.FileName, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
                 {
-                    byte[] txb = TXBConverter.EncodeTXB(Project.ToBriefing((int)levelToolStripNumericUpDown.NumericUpDownControl.Value));
+                    byte[] txb = LibDescent.Data.TXBConverter.EncodeTXB(Project.ToBriefing((int)levelToolStripNumericUpDown.NumericUpDownControl.Value));
                     fs.Write(txb, 0, txb.Length);
                 }
             }
@@ -826,7 +826,7 @@ namespace BriefingStudio.UI
                 using (FileStream fs = File.Open(importTxbFileDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.Read))
                 using (BinaryReader br = new BinaryReader(fs))
                 {
-                    txt = TXBConverter.DecodeTXB(br.ReadBytes((int)fs.Length));
+                    txt = LibDescent.Data.TXBConverter.DecodeTXB(br.ReadBytes((int)fs.Length));
                 }
             }
             catch (Exception ex)
