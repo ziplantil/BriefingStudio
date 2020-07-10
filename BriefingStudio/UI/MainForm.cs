@@ -239,7 +239,7 @@ namespace BriefingStudio.UI
                 return;
             }
 
-            byte[] font3_1 = baseHog.GetFileData("FONT3-1.FNT");
+            byte[] font3_1 = baseHog.GetLumpData("FONT3-1.FNT");
             if (font3_1 == null)
             {
                 MessageBox.Show(this, "FONT3-1.FNT not found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -257,7 +257,7 @@ namespace BriefingStudio.UI
             }
             else if (descentGame == 2)
             {
-                font3_1 = baseHog.GetFileData("FONT3-1H.FNT");
+                font3_1 = baseHog.GetLumpData("FONT3-1H.FNT");
                 if (font3_1 == null)
                 {
                     MessageBox.Show(this, "FONT3-1H.FNT not found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -327,13 +327,13 @@ namespace BriefingStudio.UI
             byte[] file = null;
             if (workingHog != null)
             {
-                file = workingHog.GetFileData(fileName);
+                file = workingHog.GetLumpData(fileName);
                 if (file != null)
                 {
                     return file;
                 }
             }
-            return baseHog.GetFileData(fileName);
+            return baseHog.GetLumpData(fileName);
         }
 
         private void lowResScreenButton_Click(object sender, EventArgs e)

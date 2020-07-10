@@ -49,7 +49,8 @@ namespace BriefingStudio.Logic
         private int brightness = 255; // [0, 255]
         private string robotMoviePlaying;
         private int robotSpinning;
-        private string bitmapDisplay;
+        private Bitmap bitmapDisplay;
+        private string bitmapDisplayText;
         public event EventHandler BriefingEnded;
         private Brush placeholderBrush = new SolidBrush(Color.FromArgb(0, 0, 0));
         private Pen placeholderBorderPen = new Pen(Color.FromArgb(255, 0, 0));
@@ -633,6 +634,7 @@ namespace BriefingStudio.Logic
             robotMoviePlaying = null;
             robotSpinning = -1;
             bitmapDisplay = null;
+            bitmapDisplayText = null;
             font.Reset();
         }
 
@@ -839,11 +841,13 @@ namespace BriefingStudio.Logic
                         if (descentGame == 1)
                         {
                             robotSpinning = ReadMessageNumber();
+                            bitmapDisplay = null;
                             SkipRestOfLine();
                         }
                         else if (descentGame == 2)
                         {
                             robotSpinning = -1;
+                            bitmapDisplay = null;
                             robotMoviePlaying = "" + (char)NextChar();
                             SkipRestOfLine();
                         }
@@ -852,19 +856,25 @@ namespace BriefingStudio.Logic
                     {
                         robotSpinning = -1;
                         textIndex = ReadRestOfLine(text, textIndex, out string res);
-                        bitmapDisplay = res + "#0";
+                        bitmapDisplay = null;
+                        bitmapDisplayText = res + "#0";
                     }
                     else if (c == 'O')
                     {
                         robotSpinning = -1;
                         textIndex = ReadRestOfLine(text, textIndex, out string res);
-                        bitmapDisplay = res + "#0";
+                        bitmapDisplay = null;
+                        bitmapDisplayText = res + "#0";
                     }
                     else if (c == 'B')
                     {
                         robotSpinning = -1;
                         textIndex = ReadRestOfLine(text, textIndex, out string res);
-                        bitmapDisplay = res + ".BBM";
+                        bitmapDisplay = null;
+                        bitmapDisplayText = res + ".BBM";
+                        byte[] bbmImage = findFile(bitmapDisplayText);
+                        if (bbmImage != null)
+                            TryLoadBBM(bbmImage);
                     }
                     else if (c == 'S')
                     {
@@ -891,6 +901,7 @@ namespace BriefingStudio.Logic
                         else if (descentGame == 2)
                         {
                             robotSpinning = -1;
+                            bitmapDisplay = null;
                             // beginning of another section
                             // we can only reach this at the very beginning, so do nothing
                             // the beginning of the next section is never reached, instead it goes to if (c < 0) above
@@ -996,6 +1007,33 @@ namespace BriefingStudio.Logic
             }
         }
 
+        private void TryLoadBBM(byte[] bbmImage)
+        {
+            LibDescent.Data.BBMImage bbm = new LibDescent.Data.BBMImage();
+            try
+            {
+                bbm.Read(bbmImage);
+            }
+            catch (Exception)
+            {
+                return;
+            }
+
+            Bitmap res = new Bitmap(bbm.Width, bbm.Height, PixelFormat.Format24bppRgb);
+            BitmapData bmpData =
+                res.LockBits(new Rectangle(0, 0, bbm.Width, bbm.Height),
+                System.Drawing.Imaging.ImageLockMode.ReadWrite,
+                res.PixelFormat);
+            IntPtr ptr = bmpData.Scan0;
+            int stride = bbm.Width * 3;
+            byte[] rgbData = bbm.GetRGBData();
+            for (int y = 0; y < res.Height; ++y)
+                System.Runtime.InteropServices.Marshal.Copy(rgbData, y * stride, ptr + y * bmpData.Stride, stride);
+            res.UnlockBits(bmpData);
+            bitmapDisplay = res;
+            bitmapDisplayText = null;
+        }
+
         private void DrawRegions()
         {
             lock (graphicsLock)
@@ -1009,17 +1047,6 @@ namespace BriefingStudio.Logic
                     graphics.FillRectangle(placeholderBrush, bx, by, bw, bh);
                     graphics.DrawRectangle(placeholderBorderPen, bx, by, bw, bh);
                     graphics.DrawString("RB" + robotMoviePlaying + ".MVE", specialFont, placeholderFontBrush, bx + 5, by + 5);
-                }
-
-                if (robotSpinning >= 0)
-                {
-                    int bx = highRes ? 276 : 138;
-                    int by = highRes ? 132 : 55;
-                    int bw = highRes ? 332 : 166;
-                    int bh = highRes ? 331 : 138;
-                    graphics.FillRectangle(placeholderBrush, bx, by, bw, bh);
-                    graphics.DrawRectangle(placeholderBorderPen, bx, by, bw, bh);
-                    graphics.DrawString("Robot#" + robotSpinning, specialFont, placeholderFontBrush, bx + 5, by + 5);
                 }
 
                 if (bitmapDisplay != null)
@@ -1039,9 +1066,40 @@ namespace BriefingStudio.Logic
                         bw = highRes ? 128 : 64;
                         bh = highRes ? 128 : 64;
                     }
+                    graphics.DrawImageUnscaledAndClipped(bitmapDisplay, new Rectangle(bx, by, bw, bh));
+                }
+
+                if (robotSpinning >= 0)
+                {
+                    int bx = highRes ? 276 : 138;
+                    int by = highRes ? 132 : 55;
+                    int bw = highRes ? 332 : 166;
+                    int bh = highRes ? 331 : 138;
                     graphics.FillRectangle(placeholderBrush, bx, by, bw, bh);
                     graphics.DrawRectangle(placeholderBorderPen, bx, by, bw, bh);
-                    graphics.DrawString(bitmapDisplay, specialFont, placeholderFontBrush, bx + 5, by + 5);
+                    graphics.DrawString("Robot#" + robotSpinning, specialFont, placeholderFontBrush, bx + 5, by + 5);
+                }
+
+                if (bitmapDisplayText != null)
+                {
+                    int bx = 0, by = 0, bw = 0, bh = 0;
+                    if (descentGame == 1)
+                    {
+                        bx = highRes ? 276 : 138;
+                        by = highRes ? 132 : 55;
+                        bw = highRes ? 332 : 166;
+                        bh = highRes ? 331 : 138;
+                    }
+                    else if (descentGame == 2)
+                    {
+                        bx = highRes ? 440 : 220;
+                        by = highRes ? 132 : 55;
+                        bw = highRes ? 128 : 64;
+                        bh = highRes ? 128 : 64;
+                    }
+                    graphics.FillRectangle(placeholderBrush, bx, by, bw, bh);
+                    graphics.DrawRectangle(placeholderBorderPen, bx, by, bw, bh);
+                    graphics.DrawString(bitmapDisplayText, specialFont, placeholderFontBrush, bx + 5, by + 5);
                 }
 
                 if (Properties.Settings.Default.showBriefingBox)

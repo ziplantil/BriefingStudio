@@ -15,7 +15,7 @@ namespace BriefingStudio.Logic.Formats
         public Bitmap LoadPCX(Stream fs, out System.Drawing.Color[] palette)
         {
             PCXImage img = new PCXImage();
-            img.LoadPCX(fs, out LibDescent.Data.Color[] rawPalette);
+            img.Read(fs);
 
             Bitmap res = new Bitmap(img.Width, img.Height, PixelFormat.Format24bppRgb);
             BitmapData bmpData =
@@ -23,11 +23,13 @@ namespace BriefingStudio.Logic.Formats
                 System.Drawing.Imaging.ImageLockMode.ReadWrite,
                 res.PixelFormat);
             IntPtr ptr = bmpData.Scan0;
-            int bytes = Math.Abs(bmpData.Stride) * res.Height;
-            System.Runtime.InteropServices.Marshal.Copy(img.Data, 0, ptr, bytes);
+            int stride = img.Width * 3;
+            byte[] rgbData = img.GetRGBData();
+            for (int y = 0; y < res.Height; ++y)
+                System.Runtime.InteropServices.Marshal.Copy(rgbData, y * stride, ptr + y * bmpData.Stride, stride);
             res.UnlockBits(bmpData);
 
-            palette = Utils.LDPaletteToGDIPalette(rawPalette);
+            palette = Utils.LDPaletteToGDIPalette(img.Palette);
             return res;
         }
 
