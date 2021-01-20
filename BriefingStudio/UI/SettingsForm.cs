@@ -26,6 +26,7 @@ namespace BriefingStudio.UI
             addEndSectionCheckBox.Checked = Properties.Settings.Default.addEndSection;
             showBriefingBoxCheckBox.Checked = Properties.Settings.Default.showBriefingBox;
             fadeTransitionsCheckBox.Checked = Properties.Settings.Default.fadeTransitions;
+            upscaleLowResCheckBox.Checked = Properties.Settings.Default.upscaleLowRes;
         }
 
         private void SettingsForm_Load(object sender, EventArgs e)
@@ -60,6 +61,12 @@ namespace BriefingStudio.UI
         private void fadeTransitionsCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.fadeTransitions = fadeTransitionsCheckBox.Checked;
+            Properties.Settings.Default.Save();
+        }
+
+        private void upscaleLowResCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.upscaleLowRes = upscaleLowResCheckBox.Checked;
             Properties.Settings.Default.Save();
         }
     }

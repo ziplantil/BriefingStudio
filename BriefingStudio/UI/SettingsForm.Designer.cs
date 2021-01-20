@@ -33,6 +33,7 @@
             this.resetButton = new System.Windows.Forms.Button();
             this.showBriefingBoxCheckBox = new System.Windows.Forms.CheckBox();
             this.fadeTransitionsCheckBox = new System.Windows.Forms.CheckBox();
+            this.upscaleLowResCheckBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // allowD2XColorsCheckBox
@@ -90,11 +91,23 @@
             this.fadeTransitionsCheckBox.UseVisualStyleBackColor = true;
             this.fadeTransitionsCheckBox.CheckedChanged += new System.EventHandler(this.fadeTransitionsCheckBox_CheckedChanged);
             // 
+            // upscaleLowResCheckBox
+            // 
+            this.upscaleLowResCheckBox.AutoSize = true;
+            this.upscaleLowResCheckBox.Location = new System.Drawing.Point(3, 104);
+            this.upscaleLowResCheckBox.Name = "upscaleLowResCheckBox";
+            this.upscaleLowResCheckBox.Size = new System.Drawing.Size(144, 17);
+            this.upscaleLowResCheckBox.TabIndex = 5;
+            this.upscaleLowResCheckBox.Text = "Up-scale low-res preview";
+            this.upscaleLowResCheckBox.UseVisualStyleBackColor = true;
+            this.upscaleLowResCheckBox.CheckedChanged += new System.EventHandler(this.upscaleLowResCheckBox_CheckedChanged);
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(299, 319);
+            this.Controls.Add(this.upscaleLowResCheckBox);
             this.Controls.Add(this.fadeTransitionsCheckBox);
             this.Controls.Add(this.showBriefingBoxCheckBox);
             this.Controls.Add(this.resetButton);
@@ -119,5 +132,6 @@
         private System.Windows.Forms.Button resetButton;
         private System.Windows.Forms.CheckBox showBriefingBoxCheckBox;
         private System.Windows.Forms.CheckBox fadeTransitionsCheckBox;
+        private System.Windows.Forms.CheckBox upscaleLowResCheckBox;
     }
 }

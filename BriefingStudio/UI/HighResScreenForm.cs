@@ -13,6 +13,7 @@ namespace BriefingStudio.UI
         public void SetImage(Bitmap b)
         {
             this.screen.Image = b;
+            this.Invalidate();
         }
 
         private void HighResScreenForm_FormClosing(object sender, FormClosingEventArgs e)
